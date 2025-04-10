@@ -10,20 +10,42 @@
       padding: 2em;
       background-color: #f8f8f8;
     }
+
     h1 {
       color: #d6336c;
     }
+
     #info {
       margin-bottom: 20px;
     }
+
     #balloon {
       width: 100px;
       height: 100px;
       background-color: #ff4d4d;
       border-radius: 50%;
       margin: 20px auto;
+      position: relative;
       transition: width 0.2s ease, height 0.2s ease;
+      overflow: hidden;
     }
+
+    #popImage {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+    }
+
+    .btn-container {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
     button {
       padding: 12px 24px;
       margin: 10px;
@@ -31,11 +53,14 @@
       cursor: pointer;
       border: none;
       border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+
     #pumpBtn {
       background-color: #4dabf7;
       color: white;
     }
+
     #collectBtn {
       background-color: #51cf66;
       color: white;
@@ -51,12 +76,17 @@
     <p><strong>Pumps:</strong> <span id="pumps">0</span></p>
     <p><strong>Score This Balloon:</strong> <span id="tempScore">0</span></p>
     <p><strong>Total Score:</strong> <span id="totalScore">0</span></p>
+    <p><strong>Click Rate (pumps/sec):</strong> <span id="clickRate">0.00</span></p>
   </div>
 
-  <div id="balloon"></div>
+  <div id="balloon">
+    <img id="popImage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABxklEQVR4Xu3YQU7DQBQF0J+YoRPwDIrYoRKwCIsgIsAiL4CRKwjGZ7Vtdu53+NkzZ89Pt9P/jO7AD+TwDiNgCUNSiGNTDCJOIQ5ncoYxtNMIk41BA8fAIEPgcgEDAcABDDkNHPplETvMH4GFXqFkHH3IEuUQFuUEd98ghZRCWYQr5Rx3wiH0Qbq+ZJkHRnFJ3KPvUUNUh7tCEyha5Qoaoet0uOqKhlylUAK+UKFqBrUK2q2Cr1WpEq5QoWoGtQrKpCVKRVKoCuUKNqALlShsgFtQpasgGlUpWuEG1CpqyFaVKlqgGtQpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpbvAf+xEw55gMt/MrH2YZto/ce9Z+AQCeCP4RAAAAAElFTkSuQmCC" alt="POP!">
+  </div>
 
-  <button id="pumpBtn">Pump</button>
-  <button id="collectBtn">Collect</button>
+  <div class="btn-container">
+    <button id="pumpBtn">Pump</button>
+    <button id="collectBtn">Collect</button>
+  </div>
 
   <script>
     let balloonNum = 1;
@@ -66,41 +96,71 @@
     let explosionThreshold = getRandomThreshold();
     const maxBalloons = 20;
     let results = [];
+    let startTime;
 
     function getRandomThreshold() {
-      return Math.floor(Math.random() * 32) + 1; // between 1–32
+      return Math.floor(Math.random() * 32) + 1;
+    }
+
+    function startBalloonTimer() {
+      startTime = performance.now();
+    }
+
+    function endBalloonTimer() {
+      let endTime = performance.now();
+      return (endTime - startTime) / 1000;
     }
 
     document.getElementById("pumpBtn").addEventListener("click", () => {
+      if (pumps === 0) startBalloonTimer();
+
       pumps++;
       tempScore++;
       updateUI();
 
       if (pumps >= explosionThreshold) {
-        alert("💥 The balloon exploded!");
-        nextBalloon(false);
+        showPop();
+        setTimeout(() => {
+          nextBalloon(false);
+        }, 700);
       } else {
         growBalloon();
       }
     });
 
     document.getElementById("collectBtn").addEventListener("click", () => {
-      totalScore += tempScore;
-      nextBalloon(true);
+      if (pumps > 0) {
+        totalScore += tempScore;
+        nextBalloon(true);
+      }
     });
 
+    function showPop() {
+      document.getElementById("popImage").style.display = "block";
+    }
+
+    function hidePop() {
+      document.getElementById("popImage").style.display = "none";
+    }
+
     function nextBalloon(collected) {
-      logTrialData(collected);
+      const timeSpent = pumps > 0 ? endBalloonTimer() : 0;
+      const clickRate = (pumps > 0 && timeSpent > 0) ? (pumps / timeSpent).toFixed(2) : "0.00";
+
+      logTrialData(collected, timeSpent, clickRate);
+
       if (balloonNum >= maxBalloons) {
         alert("🎉 Task complete! Total Score: " + totalScore);
         downloadData();
         return;
       }
+
       balloonNum++;
       pumps = 0;
       tempScore = 0;
       explosionThreshold = getRandomThreshold();
       resetBalloon();
+      hidePop();
       updateUI();
     }
 
@@ -122,22 +182,29 @@
       document.getElementById("pumps").textContent = pumps;
       document.getElementById("tempScore").textContent = tempScore;
       document.getElementById("totalScore").textContent = totalScore;
+      if (pumps === 0) {
+        document.getElementById("clickRate").textContent = "0.00";
+      }
     }
 
-    function logTrialData(collected) {
+    function logTrialData(collected, timeSpent, clickRate) {
       results.push({
         balloon: balloonNum,
         pumps: pumps,
         collected: collected,
         earned: collected ? tempScore : 0,
-        exploded: !collected
+        exploded: !collected,
+        timeSpent: timeSpent.toFixed(2),
+        clickRate: clickRate
       });
+
+      document.getElementById("clickRate").textContent = clickRate;
     }
 
     function downloadData() {
-      let csv = "balloon,pumps,collected,earned,exploded\n";
+      let csv = "balloon,pumps,collected,earned,exploded,timeSpent,clickRate\n";
       results.forEach(r => {
-        csv += `${r.balloon},${r.pumps},${r.collected},${r.earned},${r.exploded}\n`;
+        csv += `${r.balloon},${r.pumps},${r.collected},${r.earned},${r.exploded},${r.timeSpent},${r.clickRate}\n`;
       });
       let blob = new Blob([csv], { type: 'text/csv' });
       let link = document.createElement("a");
