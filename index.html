@@ -3,28 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>BART Task</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 2em;
+      padding: 1em;
+      margin: 0;
       background-color: #f8f8f8;
     }
 
     h1 {
       color: #d6336c;
+      font-size: 1.5em;
     }
 
     #info {
-      margin-bottom: 20px;
+      margin-bottom: 1em;
+      font-size: 1em;
     }
 
     #balloon {
       width: 100px;
       height: 100px;
-      background-color: #8B0000; /* 🎯 Dark red */
+      background-color: #8B0000; /* Dark red */
       border-radius: 50%;
-      margin: 20px auto;
+      margin: 10px auto;
       position: relative;
       transition: width 0.2s ease, height 0.2s ease;
       overflow: hidden;
@@ -35,27 +39,17 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%);
       width: 80%;
-      opacity: 0;
-      transition: transform 0.3s ease, opacity 0.6s ease;
-    }
-
-    #popImage.pop-active {
-      display: block;
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.2);
     }
 
     .btn-container {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: relative;
+      margin-top: 20px;
     }
 
     button {
-      padding: 12px 24px;
+      padding: 10px 20px;
       margin: 10px;
       font-size: 16px;
       cursor: pointer;
@@ -73,6 +67,20 @@
       background-color: #51cf66;
       color: white;
     }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.2em;
+      }
+
+      #balloon {
+        margin: 10px auto;
+      }
+
+      .btn-container {
+        margin-top: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -88,7 +96,7 @@
   </div>
 
   <div id="balloon">
-    <img id="popImage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABxklEQVR4Xu3YQU7DQBQF0J+YoRPwDIrYoRKwCIsgIsAiL4CRKwjGZ7Vtdu53+NkzZ89Pt9P/jO7AD+TwDiNgCUNSiGNTDCJOIQ5ncoYxtNMIk41BA8fAIEPgcgEDAcABDDkNHPplETvMH4GFXqFkHH3IEuUQFuUEd98ghZRCWYQr5Rx3wiH0Qbq+ZJkHRnFJ3KPvUUNUh7tCEyha5Qoaoet0uOqKhlylUAK+UKFqBrUK2q2Cr1WpEq5QoWoGtQrKpCVKRVKoCuUKNqALlShsgFtQpasgGlUpWuEG1CpqyFaVKlqgGtQpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpasgG1QpbvAf+xEw55gMt/MrH2YZto/ce9Z+AQCeCP4RAAAAAElFTkSuQmCC" alt="POP!">
+    <img id="popImage" src="https://i.imgur.com/GnfrPHw.png" alt="POP!">
   </div>
 
   <div class="btn-container">
@@ -130,7 +138,7 @@
         showPop();
         setTimeout(() => {
           nextBalloon(false);
-        }, 700);
+        }, 800);
       } else {
         growBalloon();
       }
@@ -144,16 +152,11 @@
     });
 
     function showPop() {
-      const img = document.getElementById("popImage");
-      img.classList.add("pop-active");
-      setTimeout(() => {
-        hidePop();
-      }, 600);
+      document.getElementById("popImage").style.display = "block";
     }
 
     function hidePop() {
-      const img = document.getElementById("popImage");
-      img.classList.remove("pop-active");
+      document.getElementById("popImage").style.display = "none";
     }
 
     function nextBalloon(collected) {
@@ -173,6 +176,7 @@
       tempScore = 0;
       explosionThreshold = getRandomThreshold();
       resetBalloon();
+      hidePop();
       updateUI();
     }
 
