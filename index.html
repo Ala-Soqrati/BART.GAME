@@ -22,7 +22,7 @@
     #balloon {
       width: 100px;
       height: 100px;
-      background-color: #ff4d4d;
+      background-color: #8B0000; /* 🎯 Dark red */
       border-radius: 50%;
       margin: 20px auto;
       position: relative;
@@ -35,8 +35,16 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(1);
       width: 80%;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.6s ease;
+    }
+
+    #popImage.pop-active {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.2);
     }
 
     .btn-container {
@@ -136,11 +144,16 @@
     });
 
     function showPop() {
-      document.getElementById("popImage").style.display = "block";
+      const img = document.getElementById("popImage");
+      img.classList.add("pop-active");
+      setTimeout(() => {
+        hidePop();
+      }, 600);
     }
 
     function hidePop() {
-      document.getElementById("popImage").style.display = "none";
+      const img = document.getElementById("popImage");
+      img.classList.remove("pop-active");
     }
 
     function nextBalloon(collected) {
@@ -160,7 +173,6 @@
       tempScore = 0;
       explosionThreshold = getRandomThreshold();
       resetBalloon();
-      hidePop();
       updateUI();
     }
 
