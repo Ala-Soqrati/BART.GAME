@@ -26,7 +26,7 @@
     #balloon {
       width: 100px;
       height: 100px;
-      background-color: #8B0000; /* Dark red */
+      background-color: #ff4d4d; /* 🔴 Original red */
       border-radius: 50%;
       margin: 10px auto;
       position: relative;
@@ -40,11 +40,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 80%;
+      width: 70%;
     }
 
     .btn-container {
-      position: relative;
       margin-top: 20px;
     }
 
@@ -76,10 +75,6 @@
       #balloon {
         margin: 10px auto;
       }
-
-      .btn-container {
-        margin-top: 10px;
-      }
     }
   </style>
 </head>
@@ -90,9 +85,7 @@
   <div id="info">
     <p><strong>Balloon #:</strong> <span id="balloonNum">1</span></p>
     <p><strong>Pumps:</strong> <span id="pumps">0</span></p>
-    <p><strong>Score This Balloon:</strong> <span id="tempScore">0</span></p>
-    <p><strong>Total Score:</strong> <span id="totalScore">0</span></p>
-    <p><strong>Click Rate (pumps/sec):</strong> <span id="clickRate">0.00</span></p>
+    <p><strong>Score:</strong> <span id="totalScore">0</span></p>
   </div>
 
   <div id="balloon">
@@ -196,11 +189,7 @@
     function updateUI() {
       document.getElementById("balloonNum").textContent = balloonNum;
       document.getElementById("pumps").textContent = pumps;
-      document.getElementById("tempScore").textContent = tempScore;
       document.getElementById("totalScore").textContent = totalScore;
-      if (pumps === 0) {
-        document.getElementById("clickRate").textContent = "0.00";
-      }
     }
 
     function logTrialData(collected, timeSpent, clickRate) {
@@ -213,8 +202,6 @@
         timeSpent: timeSpent.toFixed(2),
         clickRate: clickRate
       });
-
-      document.getElementById("clickRate").textContent = clickRate;
     }
 
     function downloadData() {
