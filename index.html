@@ -17,7 +17,7 @@
     #info {
       margin-bottom: 1em;
       font-size: 1.1em;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       display: inline-block;
       padding: 10px 20px;
       border-radius: 10px;
@@ -83,7 +83,7 @@
   <div id="info">
     <p><strong>Balloon #:</strong> <span id="balloonNum">1</span></p>
     <p><strong>Score:</strong> <span id="pumps">0</span></p>
-    <p><strong><span class="icon">🐷</span>:</strong> <span id="totalScore">0</span></p>
+    <p><strong><span class="icon">💵</span>:</strong> <span id="totalScore">$0.00</span></p>
   </div>
 
   <div id="balloon">
@@ -97,8 +97,8 @@
 
   <script>
     let balloonNum = 1;
-    let totalScore = 0;
-    let tempScore = 0;
+    let totalScore = 0; // In cents
+    let tempScore = 0;  // In cents
     let pumps = 0;
     let explosionThreshold = getRandomThreshold();
     const maxBalloons = 20;
@@ -122,7 +122,7 @@
       if (pumps === 0) startBalloonTimer();
 
       pumps++;
-      tempScore++;
+      tempScore += 50; // +$0.50
       updateUI();
 
       if (pumps >= explosionThreshold) {
@@ -159,7 +159,7 @@
       logTrialData(collected, timeSpent, clickRate);
 
       if (balloonNum >= maxBalloons) {
-        alert("🎉 Task complete! Total Score: " + totalScore);
+        alert(`🎉 Task complete! Total Score: $${(totalScore / 100).toFixed(2)}`);
         disableButtons();
         downloadData();
         return;
@@ -191,7 +191,7 @@
     function updateUI() {
       document.getElementById("balloonNum").textContent = balloonNum;
       document.getElementById("pumps").textContent = pumps;
-      document.getElementById("totalScore").textContent = totalScore;
+      document.getElementById("totalScore").textContent = `$${(totalScore / 100).toFixed(2)}`;
     }
 
     function logTrialData(collected, timeSpent, clickRate) {
@@ -199,7 +199,7 @@
         balloon: balloonNum,
         pumps: pumps,
         collected: collected,
-        earned: collected ? tempScore : 0,
+        earned: collected ? (tempScore / 100).toFixed(2) : 0,
         exploded: !collected,
         timeSpent: timeSpent.toFixed(2),
         clickRate: clickRate
