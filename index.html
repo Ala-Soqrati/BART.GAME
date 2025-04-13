@@ -82,7 +82,7 @@
 
   <div id="info">
     <p><strong>Balloon #:</strong> <span id="balloonNum">1</span></p>
-    <p><strong>Score:</strong> <span id="pumps">0</span></p>
+    <p><strong>Score:</strong> <span id="tempDollarScore">$0.00</span></p>
     <p><strong><span class="icon">💵</span>:</strong> <span id="totalScore">$0.00</span></p>
   </div>
 
@@ -190,7 +190,7 @@
 
     function updateUI() {
       document.getElementById("balloonNum").textContent = balloonNum;
-      document.getElementById("pumps").textContent = pumps;
+      document.getElementById("tempDollarScore").textContent = `$${(tempScore / 100).toFixed(2)}`;
       document.getElementById("totalScore").textContent = `$${(totalScore / 100).toFixed(2)}`;
     }
 
