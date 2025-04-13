@@ -146,7 +146,6 @@
 
     function showPop() {
       document.getElementById("popImage").style.display = "block";
-      document.getElementById("balloon").style.display = "none";
     }
 
     function hidePop() {
@@ -170,7 +169,7 @@
       tempScore = 0;
       explosionThreshold = getRandomThreshold();
       resetBalloon();
-      hidePop();
+      showPop();
       updateUI();
     }
 
