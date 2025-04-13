@@ -10,17 +10,17 @@
       text-align: center;
       padding: 1em;
       margin: 0;
-      background-color: #f8f8f8;
-    }
-
-    h1 {
-      color: #d6336c;
-      font-size: 1.5em;
+      background: url('a_peaceful_cartoon_landscape_background_for_a_psyc.png') no-repeat center center fixed;
+      background-size: cover;
     }
 
     #info {
       margin-bottom: 1em;
-      font-size: 1em;
+      font-size: 1.1em;
+      background: rgba(255, 255, 255, 0.8);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 10px;
     }
 
     #balloon {
@@ -68,24 +68,22 @@
     }
 
     @media (max-width: 600px) {
-      h1 {
-        font-size: 1.2em;
-      }
-
       #balloon {
         margin: 10px auto;
       }
+    }
+
+    .icon {
+      font-size: 1.3em;
     }
   </style>
 </head>
 <body>
 
-  <h1>Balloon Analogue Risk Task (BART)</h1>
-
   <div id="info">
     <p><strong>Balloon #:</strong> <span id="balloonNum">1</span></p>
-    <p><strong>Pumps:</strong> <span id="pumps">0</span></p>
-    <p><strong>Score:</strong> <span id="totalScore">0</span></p>
+    <p><strong>Score:</strong> <span id="pumps">0</span></p>
+    <p><strong><span class="icon">🐷</span>:</strong> <span id="totalScore">0</span></p>
   </div>
 
   <div id="balloon">
