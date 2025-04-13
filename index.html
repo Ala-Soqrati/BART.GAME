@@ -26,7 +26,7 @@
     #balloon {
       width: 100px;
       height: 100px;
-      background-color: #ff4d4d; /* 🔴 Original red */
+      background-color: #ff4d4d;
       border-radius: 50%;
       margin: 10px auto;
       position: relative;
@@ -147,7 +147,7 @@
     function showPop() {
       const balloon = document.getElementById("balloon");
       document.getElementById("popImage").style.display = "block";
-      balloon.style.backgroundColor = "transparent"; // Hide red background
+      balloon.style.backgroundColor = "transparent";
     }
 
     function hidePop() {
@@ -162,6 +162,7 @@
 
       if (balloonNum >= maxBalloons) {
         alert("🎉 Task complete! Total Score: " + totalScore);
+        disableButtons();
         downloadData();
         return;
       }
@@ -185,8 +186,8 @@
       const balloon = document.getElementById("balloon");
       balloon.style.width = "100px";
       balloon.style.height = "100px";
-      balloon.style.backgroundColor = "#ff4d4d"; // Reset red
-      hidePop(); // Hide pop image for next balloon
+      balloon.style.backgroundColor = "#ff4d4d";
+      hidePop();
     }
 
     function updateUI() {
@@ -217,6 +218,11 @@
       link.href = URL.createObjectURL(blob);
       link.download = "bart_results.csv";
       link.click();
+    }
+
+    function disableButtons() {
+      document.getElementById("pumpBtn").disabled = true;
+      document.getElementById("collectBtn").disabled = true;
     }
   </script>
 
