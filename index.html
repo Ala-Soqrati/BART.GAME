@@ -6,13 +6,17 @@
   <title>بازی بادکنک</title>
   <style>
     body {
-      background-image: url('background1.png');
+      background-image: url('background.png');
       background-size: cover;
       font-family: Tahoma, sans-serif;
-      text-align: right;
-      padding: 20px;
       color: #333;
       margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
     }
 
     #balloon {
@@ -21,7 +25,7 @@
     }
 
     #buttons {
-      margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     button {
@@ -43,11 +47,10 @@
       font-size: 22px;
       color: red;
       font-weight: bold;
-    }
-
-    /* Right-aligned texts */
-    .text-right {
-      text-align: right;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     /* Mobile responsiveness */
@@ -79,18 +82,18 @@
 <body>
 
   <h1>بازی بادکنک</h1>
-  <img id="balloon" src="Balloon2.png" alt="Balloon">
-  
-  <div id="buttons" class="text-right">
+
+  <!-- Buttons are now above the balloon -->
+  <div id="buttons">
     <button onclick="pumpBalloon()">باد کردن</button>
     <button onclick="collectPoints()">جمع کردن</button>
   </div>
 
-  <div id="counter" class="text-right">شمارنده: 0</div>
-  <div id="score" class="text-right">امتیاز: 0</div>
-  <div id="balloonNumber" class="text-right">شماره بادکنک: 1/45</div>
-  <div id="message" class="text-right"></div>
-  <div id="countdown" class="text-right"></div>
+  <img id="balloon" src="Balloon1.png" alt="Balloon">
+  
+  <div id="counter">تعداد پمپ: 0</div>
+  <div id="score">امتیاز: 0</div>
+  <div id="balloonNumber">شماره بادکنک: 1/45</div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -110,9 +113,9 @@
       points = 0;
       balloonWidth = 150;
       balloonExploded = false;
-      document.getElementById('balloon').src = 'Balloon2.png';
+      document.getElementById('balloon').src = 'Balloon1.png';
       document.getElementById('balloon').style.width = balloonWidth + 'px';
-      document.getElementById('counter').innerText = "شمارنده: 0";
+      document.getElementById('counter').innerText = "تعداد پمپ: 0";
       document.getElementById('score').innerText = "امتیاز: 0";
       document.getElementById('balloonNumber').innerText = `شماره بادکنک: ${balloonIndex}/45`;
       document.getElementById('message').innerText = "";
@@ -127,12 +130,12 @@
       const pumpStart = Date.now();
       pumpCount++;
       points += 5;
-      document.getElementById('counter').innerText = `شمارنده: ${pumpCount}`;
+      document.getElementById('counter').innerText = `تعداد پمپ: ${pumpCount}`;
       document.getElementById('score').innerText = `امتیاز: ${points}`;
       
-      balloonWidth += 10;
-      if (balloonWidth > 300) {
-        balloonWidth = 300;  // Limit the balloon size
+      balloonWidth += 5; // Smaller growth per pump
+      if (balloonWidth > 250) {  // Limit the balloon size
+        balloonWidth = 250;
       }
       document.getElementById('balloon').style.width = balloonWidth + 'px';
       
@@ -167,7 +170,7 @@
     }
 
     function startCountdown() {
-      let count = 4;
+      let count = 6; // Changed to 6 seconds
       document.getElementById('countdown').innerText = count;
       let interval = setInterval(() => {
         count--;
