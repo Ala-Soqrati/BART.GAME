@@ -1,157 +1,199 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
-
-export default function BartGame() {
-  const totalBalloons = 45;
-  const [currentBalloon, setCurrentBalloon] = useState(1);
-  const [inflateCount, setInflateCount] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
-  const [balloonScore, setBalloonScore] = useState(0);
-  const [balloonSize, setBalloonSize] = useState(150);
-  const [balloonPopped, setBalloonPopped] = useState(false);
-  const [message, setMessage] = useState("");
-  const [countdown, setCountdown] = useState(6);
-  const [isWaiting, setIsWaiting] = useState(false);
-  const [pumpTimes, setPumpTimes] = useState([]);
-  const [pumpStart, setPumpStart] = useState(null);
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === "Enter") handlePump();
-      if (e.code === "Space") handleCollect();
-    };
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [inflateCount, balloonPopped, isWaiting]);
-
-  const handlePump = () => {
-    if (balloonPopped || isWaiting) return;
-    if (!pumpStart) setPumpStart(Date.now());
-
-    const pumpTime = Date.now() - (pumpStart || Date.now());
-    setPumpTimes((prev) => [...prev, pumpTime]);
-    setPumpStart(Date.now());
-
-    const popChance = 1 / (68 - inflateCount);
-    const rand = Math.random();
-
-    if (rand < popChance || inflateCount >= 64) {
-      handlePop();
-    } else {
-      setInflateCount((prev) => prev + 1);
-      setBalloonScore((prev) => prev + 5);
-      setBalloonSize((prev) => prev + 10);
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>بیشترین امتیاز رو بیار</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    body {
+      background: url('a_peaceful_cartoon_landscape_background_for_a_psyc.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
     }
-  };
-
-  const handlePop = () => {
-    setBalloonPopped(true);
-    setMessage("بادکنک شما ترکید");
-    saveBalloonData(0, true);
-    startCountdown();
-  };
-
-  const handleCollect = () => {
-    if (balloonPopped || isWaiting) return;
-    setTotalScore((prev) => prev + balloonScore);
-    setMessage(`شما ${balloonScore} امتیاز به دست آوردید`);
-    saveBalloonData(balloonScore, false);
-    startCountdown();
-  };
-
-  const saveBalloonData = (score, popped) => {
-    const meanPumpTime = pumpTimes.reduce((a, b) => a + b, 0) / (pumpTimes.length || 1);
-    setData((prev) => [
-      ...prev,
-      {
-        balloonNumber: currentBalloon,
-        totalPumps: inflateCount,
-        score,
-        popped: popped ? "ترکیده" : "نترکیده",
-        totalTime: pumpTimes.reduce((a, b) => a + b, 0),
-        meanPumpTime,
-        pumpDeviationFrom32: inflateCount - 32,
-        eachPumpTimes: pumpTimes.join(", ")
-      }
-    ]);
-  };
-
-  const startCountdown = () => {
-    setIsWaiting(true);
-    let counter = 6;
-    const interval = setInterval(() => {
-      counter--;
-      setCountdown(counter);
-      if (counter === 0) {
-        clearInterval(interval);
-        nextBalloon();
-      }
-    }, 1000);
-  };
-
-  const nextBalloon = () => {
-    if (currentBalloon >= totalBalloons) {
-      downloadExcel();
-      return;
+    .header {
+      margin-bottom: 20px;
+      font-size: 32px;
+      font-weight: bold;
     }
-    setCurrentBalloon((prev) => prev + 1);
-    setInflateCount(0);
-    setBalloonScore(0);
-    setBalloonSize(150);
-    setBalloonPopped(false);
-    setMessage("");
-    setCountdown(6);
-    setIsWaiting(false);
-    setPumpTimes([]);
-    setPumpStart(null);
-  };
+    .info {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      text-align: right;
+      font-size: 18px;
+    }
+    .buttons {
+      margin: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .balloon img {
+      transition: width 0.3s, height 0.3s;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 20px;
+      height: 40px;
+    }
+  </style>
+</head>
+<body>
 
-  const downloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "BART Data");
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const fileData = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(fileData, "bart_data.xlsx");
-  };
+<div class="header">بیشترین امتیاز رو بیار</div>
 
-  return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-start p-8 bg-cover bg-center"
-      style={{ backgroundImage: "url('/a_peaceful_cartoon_landscape_background_for_a_psyc.png')" }}
-    >
-      <h1 className="text-4xl font-bold mb-4">بیشترین امتیاز رو بیار</h1>
+<div class="buttons">
+  <button id="pumpBtn">باد کردن</button>
+  <button id="collectBtn">جمع کردن</button>
+</div>
 
-      <div className="flex space-x-4 mb-4">
-        <Button onClick={handlePump} disabled={isWaiting}>باد کردن</Button>
-        <Button onClick={handleCollect} disabled={isWaiting}>جمع کردن</Button>
-      </div>
+<div class="balloon">
+  <img id="balloonImg" src="Balloon1.png" width="150" height="150" alt="Balloon">
+</div>
 
-      <div className="relative w-64 h-64 flex justify-center items-center">
-        {balloonPopped ? (
-          <img src="/pop.png" alt="ترکید" className="w-32 h-32" />
-        ) : (
-          <img
-            src="/Balloon1.png"
-            alt="بادکنک"
-            style={{ width: balloonSize, height: balloonSize }}
-          />
-        )}
-      </div>
+<div class="message" id="message"></div>
 
-      <div className="mt-4 text-center text-xl">
-        <p>{message}</p>
-        {isWaiting && <p>شروع در: {countdown}</p>}
-      </div>
+<div class="info">
+  <div>مجموع امتیاز شما: <span id="totalScore">0</span></div>
+  <div>شمارنده‌ی باد: <span id="inflateCount">0</span></div>
+  <div>بادکنک <span id="balloonNumber">1</span> از 45 بادکنک</div>
+</div>
 
-      <div className="absolute top-4 right-4 text-right space-y-2">
-        <p>مجموع امتیاز شما: {totalScore}</p>
-        <p>شمارنده‌ی باد: {inflateCount}</p>
-        <p>بادکنک {currentBalloon} از 45 بادکنک</p>
-      </div>
-    </div>
-  );
+<script>
+let totalScore = 0;
+let inflateCount = 0;
+let balloonNumber = 1;
+let balloonScore = 0;
+let balloonSize = 150;
+let balloonPopped = false;
+let isWaiting = false;
+let pumpTimes = [];
+let pumpStart = null;
+let data = [];
+
+document.getElementById('pumpBtn').onclick = pumpBalloon;
+document.getElementById('collectBtn').onclick = collectScore;
+
+document.addEventListener('keydown', function(e) {
+  if (isWaiting) return;
+  if (e.key === 'Enter') pumpBalloon();
+  if (e.code === 'Space') collectScore();
+});
+
+function pumpBalloon() {
+  if (balloonPopped || isWaiting) return;
+  if (!pumpStart) pumpStart = Date.now();
+  
+  let now = Date.now();
+  pumpTimes.push(now - pumpStart);
+  pumpStart = now;
+
+  const popChance = 1 / (68 - inflateCount);
+  const rand = Math.random();
+
+  if (rand < popChance || inflateCount >= 64) {
+    popBalloon();
+  } else {
+    inflateCount++;
+    balloonScore += 5;
+    balloonSize += 10;
+    updateBalloon();
+  }
 }
+
+function popBalloon() {
+  balloonPopped = true;
+  showMessage('بادکنک شما ترکید');
+  document.getElementById('balloonImg').src = 'pop.png';
+  saveData(0, 'ترکیده');
+  startCountdown();
+}
+
+function collectScore() {
+  if (balloonPopped || isWaiting) return;
+  totalScore += balloonScore;
+  showMessage(`شما ${balloonScore} امتیاز به دست آوردید`);
+  saveData(balloonScore, 'نترکیده');
+  startCountdown();
+}
+
+function updateBalloon() {
+  const balloon = document.getElementById('balloonImg');
+  balloon.width = balloonSize;
+  balloon.height = balloonSize;
+  document.getElementById('inflateCount').innerText = inflateCount;
+  document.getElementById('totalScore').innerText = totalScore;
+}
+
+function showMessage(msg) {
+  document.getElementById('message').innerText = msg;
+}
+
+function saveData(score, status) {
+  let meanPumpTime = pumpTimes.reduce((a, b) => a + b, 0) / (pumpTimes.length || 1);
+  let totalTime = pumpTimes.reduce((a, b) => a + b, 0);
+  data.push({
+    'بادکنک شماره': balloonNumber,
+    'تعداد پمپ': inflateCount,
+    'امتیاز کسب شده': score,
+    'ترکیده؟': status,
+    'کل زمان صرف شده': totalTime,
+    'میانگین زمان هر پمپ': meanPumpTime,
+    'انحراف تعداد پمپ از 32': inflateCount - 32,
+    'زمان هر پمپ': pumpTimes.join(', ')
+  });
+}
+
+function startCountdown() {
+  isWaiting = true;
+  let counter = 6;
+  showMessage(`شروع در: ${counter}`);
+  const interval = setInterval(() => {
+    counter--;
+    if (counter > 0) {
+      showMessage(`شروع در: ${counter}`);
+    } else {
+      clearInterval(interval);
+      nextBalloon();
+    }
+  }, 1000);
+}
+
+function nextBalloon() {
+  if (balloonNumber >= 45) {
+    downloadExcel();
+    return;
+  }
+  balloonNumber++;
+  inflateCount = 0;
+  balloonScore = 0;
+  balloonSize = 150;
+  balloonPopped = false;
+  isWaiting = false;
+  pumpTimes = [];
+  pumpStart = null;
+  
+  document.getElementById('balloonImg').src = 'Balloon1.png';
+  updateBalloon();
+  document.getElementById('inflateCount').innerText = inflateCount;
+  document.getElementById('balloonNumber').innerText = balloonNumber;
+  showMessage('');
+}
+
+function downloadExcel() {
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
+}
+</script>
+
+</body>
+</html>
