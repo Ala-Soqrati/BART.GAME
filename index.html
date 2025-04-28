@@ -3,184 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مسابقه‌ی بادکنک</title>
+    <title>بیشترین امتیاز رو بیار</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: Arial, sans-serif;
-            background: url('background1.png') no-repeat center center fixed;
+            background-image: url('background1.png');
             background-size: cover;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
             height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .game-container {
-            display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            text-align: center;
-            position: relative;
+            align-items: center;
         }
 
-        .game-info {
+        #scoreboard {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            color: white;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            text-align: right;
         }
 
         #balloon {
-            width: 150px;
-            transition: all 0.3s ease;
+            width: 200px;
+            height: 200px;
+            transition: transform 0.2s;
         }
 
         #inflateButton, #collectButton {
             font-size: 18px;
-            margin: 20px;
             padding: 10px 20px;
-            background-color: #4CAF50;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #ff6347;
             color: white;
             border: none;
-            cursor: pointer;
+            border-radius: 5px;
         }
 
         #inflateButton:hover, #collectButton:hover {
-            background-color: #45a049;
+            background-color: #ff4500;
         }
 
-        #message {
+        #gameTitle {
             font-size: 24px;
-            color: white;
-            margin-top: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .score-text {
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="game-info">
-            <p id="balloonNumber">شماره بادکنک: 1/45</p>
-            <p id="pumpCount">تعداد پمپ: 0</p>
-            <p id="score">جمع امتیاز: 0 امتیاز</p>
-            <p id="deviation">انحراف: 0</p>
-            <button id="inflateButton">باد کردن</button>
-            <button id="collectButton">جمع کردن</button>
-        </div>
-        <div class="balloon-container">
-            <img id="balloon" src="Balloon1.png" alt="Balloon">
-        </div>
-        <div id="message"></div>
+
+<div id="game-container">
+    <div id="gameTitle">بیشترین امتیاز رو بیار</div>
+    
+    <div id="scoreboard">
+        <div id="score" class="score-text">مجموع امتیاز شما: 0</div>
+        <div id="pumpCounter" class="score-text">تعداد پمپ: 0</div>
+        <div id="balloonNumber" class="score-text">شماره بادکنک: 1/45</div>
     </div>
 
-    <script>
-        let balloon = document.getElementById("balloon");
-        let inflateButton = document.getElementById("inflateButton");
-        let collectButton = document.getElementById("collectButton");
-        let balloonNumber = document.getElementById("balloonNumber");
-        let pumpCount = document.getElementById("pumpCount");
-        let score = document.getElementById("score");
-        let deviation = document.getElementById("deviation");
-        let message = document.getElementById("message");
+    <div>
+        <button id="inflateButton">باد کردن</button>
+        <button id="collectButton">جمع کردن</button>
+    </div>
+    
+    <img id="balloon" src="Balloon1.png" alt="Balloon">
+</div>
 
-        let points = 0;
-        let pumps = 0;
-        let balloonSize = 1.0;
-        let exploded = false;
-        let timeSpent = 0;
-        let balloonIndex = 1;
-        let explosionProbability = 1 / 64;
-        let timePerPump = [];
-        let totalTime = 0;
-        let deviationFrom64 = 0;
+<script>
+// BART Game Code
 
-        inflateButton.addEventListener("click", inflateBalloon);
-        collectButton.addEventListener("click", collectPoints);
+// Required HTML Elements
+const background = document.getElementById('background');
+const balloon = document.getElementById('balloon');
+const scoreElement = document.getElementById('score');
+const pumpCounterElement = document.getElementById('pumpCounter');
+const balloonNumberElement = document.getElementById('balloonNumber');
+const gameTitle = document.getElementById('gameTitle');
+const inflateButton = document.getElementById('inflateButton');
+const collectButton = document.getElementById('collectButton');
 
-        function inflateBalloon() {
-            if (exploded) return;
+let score = 0;
+let pumpCount = 0;
+let balloonNumber = 1;
+let totalBalloons = 45;
+let isExploded = false;
+let balloonPumps = [];
+let explosionProbability = 1 / 64;
+let startTime = 0;
+let elapsedTime = 0;
+let timePerPump = [];
 
-            // Inflate balloon and update the size
-            balloonSize += 0.02;
-            balloon.style.transform = `scale(${balloonSize})`;
+// Update the score, pump counter and balloon number display
+function updateDisplay() {
+  scoreElement.innerText = 'مجموع امتیاز شما: ' + score;
+  pumpCounterElement.innerText = 'تعداد پمپ: ' + pumpCount;
+  balloonNumberElement.innerText = 'شماره بادکنک: ' + balloonNumber + '/' + totalBalloons;
+}
 
-            pumps++;
-            points += 5;
-            deviationFrom64 = Math.abs(64 - pumps);
-            timeSpent = performance.now();
+// Inflate Balloon
+function inflateBalloon() {
+  if (!isExploded) {
+    pumpCount++;
+    balloon.style.transform = `scale(${1 + pumpCount / 100})`;  // Grow balloon
+    score += 5;  // Increase score
+    explosionProbability = 1 / (64 - pumpCount);  // Increase explosion chance
+    timePerPump.push(Date.now() - startTime); // Log time for pump
+    startTime = Date.now();
+    checkExplosion();
+    updateDisplay();
+  }
+}
 
-            // Update text
-            pumpCount.textContent = `تعداد پمپ: ${pumps}`;
-            score.textContent = `جمع امتیاز: ${points} امتیاز`;
-            deviation.textContent = `انحراف: ${deviationFrom64}`;
+// Check for explosion
+function checkExplosion() {
+  let randomChance = Math.random();
+  if (randomChance <= explosionProbability) {
+    balloonExploded();
+  }
+}
 
-            // Check explosion chance
-            if (Math.random() < explosionProbability) {
-                exploded = true;
-                setTimeout(explosion, 1000);
-            }
+// Balloon Exploded
+function balloonExploded() {
+  isExploded = true;
+  balloon.src = 'pop.png';  // Show popping image
+  alert('.بادکنک شما ترکید');  // Show explosion message
+  setTimeout(nextBalloon, 1000);  // Go to next balloon
+}
 
-            // Update balloon number if necessary
-            if (pumps >= 45) {
-                balloonIndex++;
-                balloonNumber.textContent = `شماره بادکنک: ${balloonIndex}/45`;
-            }
-        }
+// Go to next Balloon
+function nextBalloon() {
+  balloonNumber++;  // Next balloon
+  if (balloonNumber > totalBalloons) {
+    alert('Game Over!');
+    saveData();  // Save data when game finishes
+  } else {
+    balloon.src = 'Balloon1.png';  // Reset balloon image
+    isExploded = false;  // Reset explosion status
+    pumpCount = 0;  // Reset pump count
+    updateDisplay();
+  }
+}
 
-        function collectPoints() {
-            if (exploded) return;
+// Collect Points
+function collectPoints() {
+  if (!isExploded) {
+    score += 20;  // Add points
+    alert('شما 20 امتیاز به دست آوردید');  // Show collect message
+    setTimeout(nextBalloon, 1000);  // Go to next balloon
+  }
+}
 
-            message.textContent = `امتیاز به دست آورده: ${points}`;
-            setTimeout(nextBalloon, 2000);
-        }
+// Save game data as CSV
+function saveData() {
+  let data = [];
+  for (let i = 0; i < balloonPumps.length; i++) {
+    data.push([
+      i + 1,  // Balloon number
+      balloonPumps[i].timePerPump.join(','),  // Time per pump
+      balloonPumps[i].avgTimePerPump,  // Average time per pump
+      balloonPumps[i].exploded,  // Exploded or not
+      balloonPumps[i].points,  // Points earned
+      balloonPumps[i].totalTime,  // Total time spent
+      balloonPumps[i].pumps,  // Number of pumps
+      balloonPumps[i].deviation // Deviation from 64
+    ]);
+  }
 
-        function explosion() {
-            message.textContent = "بادکنک شما ترکید!";
-            setTimeout(countdown, 1000);
-        }
+  let csvContent = 'Balloon,TimePerPump,AvgTimePerPump,Exploded,Points,TotalTime,Pumps,Deviation\n';
+  data.forEach((row) => {
+    csvContent += row.join(',') + '\n';
+  });
 
-        function countdown() {
-            let count = 6;
-            let interval = setInterval(function () {
-                message.textContent = `بادکنک شما ترکید! ${count}`;
-                count--;
-                if (count < 0) {
-                    clearInterval(interval);
-                    nextBalloon();
-                }
-            }, 1000);
-        }
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'BART_Game_Data.csv';
+  link.click();
+}
 
-        function nextBalloon() {
-            // Reset game stats for next balloon
-            pumps = 0;
-            balloonSize = 1.0;
-            points = 0;
-            exploded = false;
-            balloon.style.transform = `scale(${balloonSize})`;
-            message.textContent = '';
-            balloonNumber.textContent = `شماره بادکنک: ${balloonIndex + 1}/45`;
-            pumpCount.textContent = `تعداد پمپ: ${pumps}`;
-            score.textContent = `جمع امتیاز: ${points} امتیاز`;
-            deviation.textContent = `انحراف: 0`;
-            explosionProbability = 1 / (64 - pumps);  // Adjust explosion probability
-        }
+// Key event listeners for keyboard interaction
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    inflateBalloon();  // Inflate balloon on Enter
+  } else if (e.key === ' ') {
+    collectPoints();  // Collect points on Space
+  }
+});
 
-        document.addEventListener('keydown', function (event) {
-            if (event.key === "Enter" && !exploded) {
-                inflateBalloon();
-            }
-            if (event.key === " " && !exploded) {
-                collectPoints();
-            }
-        });
-    </script>
+// Initialize game
+gameTitle.innerText = 'بیشترین امتیاز رو بیار';  // Set game title
+inflateButton.onclick = inflateBalloon;  // Inflate button click
+collectButton.onclick = collectPoints;  // Collect button click
+updateDisplay();
+</script>
+
 </body>
 </html>
