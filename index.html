@@ -91,7 +91,7 @@
 
   <img id="balloon" src="Balloon1.png" alt="Balloon">
   
-  <div id="counter">تعداد پمپ: 0</div>
+  <div id="counter">شمارنده: 0</div>
   <div id="score">امتیاز: 0</div>
   <div id="balloonNumber">شماره بادکنک: 1/45</div>
 
@@ -115,7 +115,7 @@
       balloonExploded = false;
       document.getElementById('balloon').src = 'Balloon1.png';
       document.getElementById('balloon').style.width = balloonWidth + 'px';
-      document.getElementById('counter').innerText = "تعداد پمپ: 0";
+      document.getElementById('counter').innerText = "شمارنده: 0";
       document.getElementById('score').innerText = "امتیاز: 0";
       document.getElementById('balloonNumber').innerText = `شماره بادکنک: ${balloonIndex}/45`;
       document.getElementById('message').innerText = "";
@@ -130,7 +130,7 @@
       const pumpStart = Date.now();
       pumpCount++;
       points += 5;
-      document.getElementById('counter').innerText = `تعداد پمپ: ${pumpCount}`;
+      document.getElementById('counter').innerText = `شمارنده: ${pumpCount}`;
       document.getElementById('score').innerText = `امتیاز: ${points}`;
       
       balloonWidth += 5; // Smaller growth per pump
@@ -175,65 +175,4 @@
       let interval = setInterval(() => {
         count--;
         document.getElementById('countdown').innerText = count;
-        if (count < 0) {
-          clearInterval(interval);
-          nextBalloon();
-        }
-      }, 1000);
-    }
-
-    function nextBalloon() {
-      balloonIndex++;
-      if (balloonIndex > 45) {
-        endGame();
-      } else {
-        resetBalloon();
-      }
-    }
-
-    function saveBalloonData(exploded) {
-      let avgTime = pumpTimes.length > 0 ? (pumpTimes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / pumpTimes.length).toFixed(2) : 0;
-      let totalTime = pumpTimes.length > 0 ? pumpTimes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(2) : 0;
-      let deviation = pumpCount - 64;
-
-      balloonData.push({
-        "شماره بادکنک": balloonIndex,
-        "آیا ترکید؟": exploded ? "ترکید" : "ترک نکرد",
-        "امتیاز کسب شده": points,
-        "تعداد باد کردن": pumpCount,
-        "زمان کل (ثانیه)": totalTime,
-        "میانگین زمان هر باد کردن (ثانیه)": avgTime,
-        "انحراف از 64": deviation,
-        "زمان‌های هر باد کردن (ثانیه)": pumpTimes.join(", ")
-      });
-
-      if (!exploded) {
-        totalPoints += points;
-      }
-    }
-
-    function endGame() {
-      document.getElementById('buttons').style.display = 'none';
-      document.getElementById('message').innerText = `جمع امتیاز دریافتی شما: ${totalPoints}امتیاز`;
-      downloadExcel();
-    }
-
-    function downloadExcel() {
-      let wb = XLSX.utils.book_new();
-      let ws = XLSX.utils.json_to_sheet(balloonData);
-      XLSX.utils.book_append_sheet(wb, ws, "BalloonGame");
-      XLSX.writeFile(wb, "balloon_game_data.xlsx");
-    }
-
-    resetBalloon();
-
-    // Listen for the Enter key press to inflate the balloon
-    window.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        pumpBalloon(); // Inflate the balloon on Enter key press
-      }
-    });
-  </script>
-
-</body>
-</html>
+        if (count <
