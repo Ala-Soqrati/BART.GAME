@@ -1,242 +1,186 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بازی بادکنک</title>
-  <style>
-    body {
-      background-image: url('background1.png'); /* Background changed to background1.png */
-      background-size: cover;
-      font-family: Tahoma, sans-serif;
-      color: #333;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقه‌ی بادکنک</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    #balloon {
-      width: 150px;
-      transition: width 0.3s, height 0.3s;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background: url('background1.png') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    #buttons {
-      margin-bottom: 20px;
-    }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
 
-    button {
-      font-size: 18px;
-      padding: 8px 16px;
-      margin: 10px;
-      cursor: pointer;
-      width: 120px;
-    }
+        .game-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: white;
+        }
 
-    #counter, #score, #balloonNumber {
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-    }
+        #balloon {
+            width: 150px;
+            transition: all 0.3s ease;
+        }
 
-    #message, #countdown {
-      margin-top: 20px;
-      font-size: 22px;
-      color: red;
-      font-weight: bold;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
+        #inflateButton, #collectButton {
+            font-size: 18px;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
 
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
+        #inflateButton:hover, #collectButton:hover {
+            background-color: #45a049;
+        }
 
-      #balloon {
-        width: 120px;
-      }
-
-      button {
-        font-size: 16px;
-        padding: 6px 12px;
-        width: 100px;
-      }
-
-      #counter, #score, #balloonNumber {
-        font-size: 16px;
-      }
-
-      #message, #countdown {
-        font-size: 20px;
-      }
-    }
-  </style>
+        #message {
+            font-size: 24px;
+            color: white;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
+    <div class="game-container">
+        <div class="game-info">
+            <p id="balloonNumber">شماره بادکنک: 1/45</p>
+            <p id="pumpCount">تعداد پمپ: 0</p>
+            <p id="score">جمع امتیاز: 0 امتیاز</p>
+            <p id="deviation">انحراف: 0</p>
+            <button id="inflateButton">باد کردن</button>
+            <button id="collectButton">جمع کردن</button>
+        </div>
+        <div class="balloon-container">
+            <img id="balloon" src="Balloon1.png" alt="Balloon">
+        </div>
+        <div id="message"></div>
+    </div>
 
-  <h1>بازی بادکنک</h1>
+    <script>
+        let balloon = document.getElementById("balloon");
+        let inflateButton = document.getElementById("inflateButton");
+        let collectButton = document.getElementById("collectButton");
+        let balloonNumber = document.getElementById("balloonNumber");
+        let pumpCount = document.getElementById("pumpCount");
+        let score = document.getElementById("score");
+        let deviation = document.getElementById("deviation");
+        let message = document.getElementById("message");
 
-  <!-- Buttons are now above the balloon -->
-  <div id="buttons">
-    <button onclick="pumpBalloon()">باد کردن</button>
-    <button onclick="collectPoints()">جمع کردن</button>
-  </div>
+        let points = 0;
+        let pumps = 0;
+        let balloonSize = 1.0;
+        let exploded = false;
+        let timeSpent = 0;
+        let balloonIndex = 1;
+        let explosionProbability = 1 / 64;
+        let timePerPump = [];
+        let totalTime = 0;
+        let deviationFrom64 = 0;
 
-  <img id="balloon" src="Balloon1.png" alt="Balloon">
-  
-  <div id="counter">شمارنده: 0</div>
-  <div id="score">امتیاز: 0</div>
-  <div id="balloonNumber">شماره بادکنک: 1/45</div>
+        inflateButton.addEventListener("click", inflateBalloon);
+        collectButton.addEventListener("click", collectPoints);
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        function inflateBalloon() {
+            if (exploded) return;
 
-  <script>
-    let pumpCount = 0;
-    let points = 0;
-    let totalPoints = 0;
-    let balloonIndex = 1;
-    let balloonWidth = 150;
-    let balloonExploded = false;
-    let startTime = 0;
-    let pumpTimes = [];
-    let balloonData = [];
+            // Inflate balloon and update the size
+            balloonSize += 0.02;
+            balloon.style.transform = `scale(${balloonSize})`;
 
-    function resetBalloon() {
-      pumpCount = 0;
-      points = 0;
-      balloonWidth = 150;
-      balloonExploded = false;
-      document.getElementById('balloon').src = 'Balloon1.png';
-      document.getElementById('balloon').style.width = balloonWidth + 'px';
-      document.getElementById('counter').innerText = "شمارنده: 0";
-      document.getElementById('score').innerText = "امتیاز: 0";
-      document.getElementById('balloonNumber').innerText = `شماره بادکنک: ${balloonIndex}/45`;
-      document.getElementById('message').innerText = "";
-      document.getElementById('countdown').innerText = "";
-      pumpTimes = [];
-      startTime = Date.now();
-    }
+            pumps++;
+            points += 5;
+            deviationFrom64 = Math.abs(64 - pumps);
+            timeSpent = performance.now();
 
-    function pumpBalloon() {
-      if (balloonExploded) return;
+            // Update text
+            pumpCount.textContent = `تعداد پمپ: ${pumps}`;
+            score.textContent = `جمع امتیاز: ${points} امتیاز`;
+            deviation.textContent = `انحراف: ${deviationFrom64}`;
 
-      const pumpStart = Date.now();
-      pumpCount++;
-      points += 5;
-      document.getElementById('counter').innerText = `شمارنده: ${pumpCount}`;
-      document.getElementById('score').innerText = `امتیاز: ${points}`;
-      
-      balloonWidth += 5; // Smaller growth per pump
-      if (balloonWidth > 250) {  // Limit the balloon size
-        balloonWidth = 250;
-      }
-      document.getElementById('balloon').style.width = balloonWidth + 'px';
-      
-      const timePerPump = (pumpStart - startTime) / 1000;
-      pumpTimes.push(timePerPump.toFixed(2));
-      startTime = pumpStart;
+            // Check explosion chance
+            if (Math.random() < explosionProbability) {
+                exploded = true;
+                setTimeout(explosion, 1000);
+            }
 
-      if (shouldExplode()) {
-        explodeBalloon();
-      }
-    }
-
-    function shouldExplode() {
-      let probability = 1 / (128 - pumpCount + 1);
-      return Math.random() < probability;
-    }
-
-    function explodeBalloon() {
-      balloonExploded = true;
-      document.getElementById('balloon').src = 'pop.png';
-      document.getElementById('message').innerText = ".بادکنک شما ترکید";
-      startCountdown();
-      saveBalloonData(true);
-    }
-
-    function collectPoints() {
-      if (balloonExploded) return;
-
-      document.getElementById('message').innerText = `شما ${points}امتیاز دریافت کردید`;
-      saveBalloonData(false);
-      setTimeout(nextBalloon, 2000);
-    }
-
-    function startCountdown() {
-      let count = 6; // Changed to 6 seconds
-      document.getElementById('countdown').innerText = count;
-      let interval = setInterval(() => {
-        count--;
-        document.getElementById('countdown').innerText = count;
-        if (count < 0) {
-          clearInterval(interval);
-          nextBalloon();
+            // Update balloon number if necessary
+            if (pumps >= 45) {
+                balloonIndex++;
+                balloonNumber.textContent = `شماره بادکنک: ${balloonIndex}/45`;
+            }
         }
-      }, 1000);
-    }
 
-    function nextBalloon() {
-      balloonIndex++;
-      if (balloonIndex > 45) {
-        endGame();
-      } else {
-        resetBalloon();
-      }
-    }
+        function collectPoints() {
+            if (exploded) return;
 
-    function saveBalloonData(exploded) {
-      let avgTime = pumpTimes.length > 0 ? (pumpTimes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / pumpTimes.length).toFixed(2) : 0;
-      let totalTime = pumpTimes.length > 0 ? pumpTimes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(2) : 0;
-      let deviation = pumpCount - 64;
+            message.textContent = `امتیاز به دست آورده: ${points}`;
+            setTimeout(nextBalloon, 2000);
+        }
 
-      balloonData.push({
-        "شماره بادکنک": balloonIndex,
-        "آیا ترکید؟": exploded ? "ترکید" : "ترک نکرد",
-        "امتیاز کسب شده": points,
-        "تعداد باد کردن": pumpCount,
-        "زمان کل (ثانیه)": totalTime,
-        "میانگین زمان هر باد کردن (ثانیه)": avgTime,
-        "انحراف از 64": deviation,
-        "زمان‌های هر باد کردن (ثانیه)": pumpTimes.join(", ")
-      });
+        function explosion() {
+            message.textContent = "بادکنک شما ترکید!";
+            setTimeout(countdown, 1000);
+        }
 
-      if (!exploded) {
-        totalPoints += points;
-      }
-    }
+        function countdown() {
+            let count = 6;
+            let interval = setInterval(function () {
+                message.textContent = `بادکنک شما ترکید! ${count}`;
+                count--;
+                if (count < 0) {
+                    clearInterval(interval);
+                    nextBalloon();
+                }
+            }, 1000);
+        }
 
-    function endGame() {
-      document.getElementById('buttons').style.display = 'none';
-      document.getElementById('message').innerText = `جمع امتیاز دریافتی شما: ${totalPoints}امتیاز`;
-      downloadExcel();
-    }
+        function nextBalloon() {
+            // Reset game stats for next balloon
+            pumps = 0;
+            balloonSize = 1.0;
+            points = 0;
+            exploded = false;
+            balloon.style.transform = `scale(${balloonSize})`;
+            message.textContent = '';
+            balloonNumber.textContent = `شماره بادکنک: ${balloonIndex + 1}/45`;
+            pumpCount.textContent = `تعداد پمپ: ${pumps}`;
+            score.textContent = `جمع امتیاز: ${points} امتیاز`;
+            deviation.textContent = `انحراف: 0`;
+            explosionProbability = 1 / (64 - pumps);  // Adjust explosion probability
+        }
 
-    function downloadExcel() {
-      let wb = XLSX.utils.book_new();
-      let ws = XLSX.utils.json_to_sheet(balloonData);
-      XLSX.utils.book_append_sheet(wb, ws, "BalloonGame");
-      XLSX.writeFile(wb, "balloon_game_data.xlsx");
-    }
-
-    resetBalloon();
-
-    // Listen for the Enter key press to inflate the balloon
-    window.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        pumpBalloon(); // Inflate the balloon on Enter key press
-      }
-      if (event.key === " ") {
-        collectPoints(); // Collect points on Space key press
-      }
-    });
-  </script>
-
+        document.addEventListener('keydown', function (event) {
+            if (event.key === "Enter" && !exploded) {
+                inflateBalloon();
+            }
+            if (event.key === " " && !exploded) {
+                collectPoints();
+            }
+        });
+    </script>
 </body>
 </html>
