@@ -1,227 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>BART Task</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مسابقه‌ی بادکنک</title>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 1em;
-      margin: 0;
-      background: url('a_peaceful_cartoon_landscape_background_for_a_psyc.png') no-repeat center center fixed;
+      background-image: url('background.png');
       background-size: cover;
+      font-family: Tahoma, sans-serif;
+      text-align: center;
+      padding-top: 30px;
+      color: #333;
     }
-
-    #info {
-      margin-bottom: 1em;
-      font-size: 1.1em;
-      background: rgba(255, 255, 255, 0.85);
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 10px;
-    }
-
     #balloon {
-      width: 100px;
-      height: 100px;
-      background-color: #ff4d4d;
-      border-radius: 50%;
-      margin: 10px auto;
-      position: relative;
-      transition: width 0.2s ease, height 0.2s ease;
-      overflow: hidden;
+      width: 150px;
+      transition: width 0.3s, height 0.3s;
     }
-
-    #popImage {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 70%;
-    }
-
-    .btn-container {
+    #buttons {
       margin-top: 20px;
     }
-
     button {
+      font-size: 20px;
       padding: 10px 20px;
       margin: 10px;
-      font-size: 16px;
       cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-
-    #pumpBtn {
-      background-color: #4dabf7;
-      color: white;
+    #counter, #score, #balloonNumber {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
     }
-
-    #collectBtn {
-      background-color: #51cf66;
-      color: white;
-    }
-
-    @media (max-width: 600px) {
-      #balloon {
-        margin: 10px auto;
-      }
-    }
-
-    .icon {
-      font-size: 1.3em;
+    #message, #countdown {
+      margin-top: 20px;
+      font-size: 28px;
+      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div id="info">
-    <p><strong>Balloon #:</strong> <span id="balloonNum">1</span></p>
-    <p><strong>Score:</strong> <span id="tempDollarScore">$0.00</span></p>
-    <p><strong><span class="icon">💵</span>:</strong> <span id="totalScore">$0.00</span></p>
+  <h1>بازی بادکنک</h1>
+  <img id="balloon" src="Balloon2.png" alt="Balloon">
+  
+  <div id="buttons">
+    <button onclick="pumpBalloon()">باد کردن</button>
+    <button onclick="collectPoints()">جمع کردن</button>
   </div>
 
-  <div id="balloon">
-    <img id="popImage" src="Pop.png" alt="Pop">
-  </div>
+  <div id="counter">شمارنده: 0</div>
+  <div id="score">امتیاز: 0</div>
+  <div id="balloonNumber">شماره بادکنک: 1/45</div>
+  <div id="message"></div>
+  <div id="countdown"></div>
 
-  <div class="btn-container">
-    <button id="pumpBtn">Pump</button>
-    <button id="collectBtn">Collect</button>
-  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
-    let balloonNum = 1;
-    let totalScore = 0; // In cents
-    let tempScore = 0;  // In cents
-    let pumps = 0;
-    let explosionThreshold = getRandomThreshold();
-    const maxBalloons = 20;
-    let results = [];
-    let startTime;
-
-    function getRandomThreshold() {
-      return Math.floor(Math.random() * 32) + 1;
-    }
-
-    function startBalloonTimer() {
-      startTime = performance.now();
-    }
-
-    function endBalloonTimer() {
-      let endTime = performance.now();
-      return (endTime - startTime) / 1000;
-    }
-
-    document.getElementById("pumpBtn").addEventListener("click", () => {
-      if (pumps === 0) startBalloonTimer();
-
-      pumps++;
-      tempScore += 50; // +$0.50
-      updateUI();
-
-      if (pumps >= explosionThreshold) {
-        showPop();
-        setTimeout(() => {
-          nextBalloon(false);
-        }, 800);
-      } else {
-        growBalloon();
-      }
-    });
-
-    document.getElementById("collectBtn").addEventListener("click", () => {
-      if (pumps > 0) {
-        totalScore += tempScore;
-        nextBalloon(true);
-      }
-    });
-
-    function showPop() {
-      const balloon = document.getElementById("balloon");
-      document.getElementById("popImage").style.display = "block";
-      balloon.style.backgroundColor = "transparent";
-    }
-
-    function hidePop() {
-      document.getElementById("popImage").style.display = "none";
-    }
-
-    function nextBalloon(collected) {
-      const timeSpent = pumps > 0 ? endBalloonTimer() : 0;
-      const clickRate = (pumps > 0 && timeSpent > 0) ? (pumps / timeSpent).toFixed(2) : "0.00";
-
-      logTrialData(collected, timeSpent, clickRate);
-
-      if (balloonNum >= maxBalloons) {
-        alert(`🎉 Task complete! Total Score: $${(totalScore / 100).toFixed(2)}`);
-        disableButtons();
-        downloadData();
-        return;
-      }
-
-      balloonNum++;
-      pumps = 0;
-      tempScore = 0;
-      explosionThreshold = getRandomThreshold();
-      resetBalloon();
-      updateUI();
-    }
-
-    function growBalloon() {
-      const balloon = document.getElementById("balloon");
-      let newSize = 100 + pumps * 5;
-      balloon.style.width = newSize + "px";
-      balloon.style.height = newSize + "px";
-    }
+    let pumpCount = 0;
+    let points = 0;
+    let totalPoints = 0;
+    let balloonIndex = 1;
+    let balloonWidth = 150;
+    let balloonExploded = false;
+    let startTime = 0;
+    let pumpTimes = [];
+    let balloonData = [];
 
     function resetBalloon() {
-      const balloon = document.getElementById("balloon");
-      balloon.style.width = "100px";
-      balloon.style.height = "100px";
-      balloon.style.backgroundColor = "#ff4d4d";
-      hidePop();
+      pumpCount = 0;
+      points = 0;
+      balloonWidth = 150;
+      balloonExploded = false;
+      document.getElementById('balloon').src = 'Balloon1.png';
+      document.getElementById('balloon').style.width = balloonWidth + 'px';
+      document.getElementById('counter').innerText = "شمارنده: 0";
+      document.getElementById('score').innerText = "امتیاز: 0";
+      document.getElementById('balloonNumber').innerText = `شماره بادکنک: ${balloonIndex}/45`;
+      document.getElementById('message').innerText = "";
+      document.getElementById('countdown').innerText = "";
+      pumpTimes = [];
+      startTime = Date.now();
     }
 
-    function updateUI() {
-      document.getElementById("balloonNum").textContent = balloonNum;
-      document.getElementById("tempDollarScore").textContent = `$${(tempScore / 100).toFixed(2)}`;
-      document.getElementById("totalScore").textContent = `$${(totalScore / 100).toFixed(2)}`;
+    function pumpBalloon() {
+      if (balloonExploded) return;
+
+      const pumpStart = Date.now();
+      pumpCount++;
+      points += 5;
+      document.getElementById('counter').innerText = `شمارنده: ${pumpCount}`;
+      document.getElementById('score').innerText = `امتیاز: ${points}`;
+      
+      balloonWidth += 10;
+      document.getElementById('balloon').style.width = balloonWidth + 'px';
+      
+      const timePerPump = (pumpStart - startTime) / 1000;
+      pumpTimes.push(timePerPump.toFixed(2));
+      startTime = pumpStart;
+
+      if (shouldExplode()) {
+        explodeBalloon();
+      }
     }
 
-    function logTrialData(collected, timeSpent, clickRate) {
-      results.push({
-        balloon: balloonNum,
-        pumps: pumps,
-        collected: collected,
-        earned: collected ? (tempScore / 100).toFixed(2) : 0,
-        exploded: !collected,
-        timeSpent: timeSpent.toFixed(2),
-        clickRate: clickRate
+    function shouldExplode() {
+      let probability = 1 / (128 - pumpCount + 1);
+      return Math.random() < probability;
+    }
+
+    function explodeBalloon() {
+      balloonExploded = true;
+      document.getElementById('balloon').src = 'pop.png';
+      document.getElementById('message').innerText = ".بادکنک شما ترکید";
+      startCountdown();
+      saveBalloonData(true);
+    }
+
+    function collectPoints() {
+      if (balloonExploded) return;
+
+      document.getElementById('message').innerText = `شما ${points}امتیاز دریافت کردید`;
+      saveBalloonData(false);
+      setTimeout(nextBalloon, 2000);
+    }
+
+    function startCountdown() {
+      let count = 4;
+      document.getElementById('countdown').innerText = count;
+      let interval = setInterval(() => {
+        count--;
+        document.getElementById('countdown').innerText = count;
+        if (count < 0) {
+          clearInterval(interval);
+          nextBalloon();
+        }
+      }, 1000);
+    }
+
+    function nextBalloon() {
+      balloonIndex++;
+      if (balloonIndex > 45) {
+        endGame();
+      } else {
+        resetBalloon();
+      }
+    }
+
+    function saveBalloonData(exploded) {
+      let avgTime = pumpTimes.length > 0 ? (pumpTimes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / pumpTimes.length).toFixed(2) : 0;
+      let totalTime = pumpTimes.length > 0 ? pumpTimes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(2) : 0;
+      let deviation = pumpCount - 64;
+
+      balloonData.push({
+        "شماره بادکنک": balloonIndex,
+        "آیا ترکید؟": exploded ? "ترکید" : "نترکید",
+        "امتیاز کسب شده": points,
+        "تعداد باد کردن": pumpCount,
+        "زمان کل (ثانیه)": totalTime,
+        "میانگین زمان هر باد کردن (ثانیه)": avgTime,
+        "انحراف از 64": deviation,
+        "زمان‌های هر باد کردن (ثانیه)": pumpTimes.join(", ")
       });
+
+      if (!exploded) {
+        totalPoints += points;
+      }
     }
 
-    function downloadData() {
-      let csv = "balloon,pumps,collected,earned,exploded,timeSpent,clickRate\n";
-      results.forEach(r => {
-        csv += `${r.balloon},${r.pumps},${r.collected},${r.earned},${r.exploded},${r.timeSpent},${r.clickRate}\n`;
-      });
-      let blob = new Blob([csv], { type: 'text/csv' });
-      let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "bart_results.csv";
-      link.click();
+    function endGame() {
+      document.getElementById('buttons').style.display = 'none';
+      document.getElementById('message').innerText = `جمع امتیاز دریافتی شما: ${totalPoints}امتیاز`;
+      downloadExcel();
     }
 
-    function disableButtons() {
-      document.getElementById("pumpBtn").disabled = true;
-      document.getElementById("collectBtn").disabled = true;
+    function downloadExcel() {
+      let wb = XLSX.utils.book_new();
+      let ws = XLSX.utils.json_to_sheet(balloonData);
+      XLSX.utils.book_append_sheet(wb, ws, "BalloonGame");
+      XLSX.writeFile(wb, "balloon_game_data.xlsx");
     }
+
+    resetBalloon();
   </script>
 
 </body>
