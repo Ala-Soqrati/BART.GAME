@@ -1,239 +1,157 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بیشترین امتیاز رو بیار</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-image: url('a_peaceful_cartoon_landscape_background_for_a_psyc.png'); /* Changed background image */
-            background-size: cover;
-            text-align: center;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+export default function BartGame() {
+  const totalBalloons = 45;
+  const [currentBalloon, setCurrentBalloon] = useState(1);
+  const [inflateCount, setInflateCount] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
+  const [balloonScore, setBalloonScore] = useState(0);
+  const [balloonSize, setBalloonSize] = useState(150);
+  const [balloonPopped, setBalloonPopped] = useState(false);
+  const [message, setMessage] = useState("");
+  const [countdown, setCountdown] = useState(6);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [pumpTimes, setPumpTimes] = useState([]);
+  const [pumpStart, setPumpStart] = useState(null);
+  const [data, setData] = useState([]);
 
-        #scoreboard {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 42px; /* Increased font size by 3 times */
-            text-align: right;
-        }
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === "Enter") handlePump();
+      if (e.code === "Space") handleCollect();
+    };
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [inflateCount, balloonPopped, isWaiting]);
 
-        #balloon {
-            width: 200px;
-            height: 200px;
-            transition: transform 0.2s;
-        }
+  const handlePump = () => {
+    if (balloonPopped || isWaiting) return;
+    if (!pumpStart) setPumpStart(Date.now());
 
-        #inflateButton, #collectButton {
-            font-size: 18px;
-            padding: 10px 20px;
-            margin: 10px;
-            cursor: pointer;
-            background-color: #ff6347;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
+    const pumpTime = Date.now() - (pumpStart || Date.now());
+    setPumpTimes((prev) => [...prev, pumpTime]);
+    setPumpStart(Date.now());
 
-        #inflateButton:hover, #collectButton:hover {
-            background-color: #ff4500;
-        }
+    const popChance = 1 / (68 - inflateCount);
+    const rand = Math.random();
 
-        #gameTitle {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .score-text {
-            font-size: 12px;
-        }
-
-        /* Countdown style */
-        #countdown {
-            font-size: 40px;
-            color: red;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-
-<div id="game-container">
-    <div id="gameTitle">بیشترین امتیاز رو بیار</div>
-    
-    <div id="scoreboard">
-        <div id="score" class="score-text">مجموع امتیاز شما: 0</div>
-        <div id="pumpCounter" class="score-text">تعداد پمپ: 0</div>
-        <div id="balloonNumber" class="score-text">شماره بادکنک: 1/45</div>
-    </div>
-
-    <div>
-        <button id="inflateButton">باد کردن</button>
-        <button id="collectButton">جمع کردن</button>
-    </div>
-    
-    <img id="balloon" src="Balloon1.png" alt="Balloon">
-    <div id="countdown"></div> <!-- Countdown element -->
-</div>
-
-<script>
-// BART Game Code
-
-// Required HTML Elements
-const balloon = document.getElementById('balloon');
-const scoreElement = document.getElementById('score');
-const pumpCounterElement = document.getElementById('pumpCounter');
-const balloonNumberElement = document.getElementById('balloonNumber');
-const countdownElement = document.getElementById('countdown');
-const inflateButton = document.getElementById('inflateButton');
-const collectButton = document.getElementById('collectButton');
-
-let score = 0;
-let pumpCount = 0;
-let balloonNumber = 1;
-let totalBalloons = 45;
-let isExploded = false;
-let explosionProbability = 1 / 64;
-let startTime = 0;
-let elapsedTime = 0;
-let timePerPump = [];
-let collectedPoints = false;  // Track if the participant has collected points before explosion
-
-// Update the score, pump counter and balloon number display
-function updateDisplay() {
-  scoreElement.innerText = 'مجموع امتیاز شما: ' + score;
-  pumpCounterElement.innerText = 'تعداد پمپ: ' + pumpCount;
-  balloonNumberElement.innerText = 'شماره بادکنک: ' + balloonNumber + '/' + totalBalloons;
-}
-
-// Inflate Balloon
-function inflateBalloon() {
-  if (!isExploded) {
-    pumpCount++;
-    balloon.style.transform = `scale(${1 + pumpCount / 100})`;  // Grow balloon
-    score += 5;  // Increase score
-    explosionProbability = 1 / (64 - pumpCount);  // Increase explosion chance
-    timePerPump.push(Date.now() - startTime); // Log time for pump
-    startTime = Date.now();
-    checkExplosion();
-    updateDisplay();
-  }
-}
-
-// Check for explosion
-function checkExplosion() {
-  let randomChance = Math.random();
-  if (randomChance <= explosionProbability) {
-    balloonExploded();
-  }
-}
-
-// Balloon Exploded
-function balloonExploded() {
-  isExploded = true;
-  balloon.src = 'pop.png';  // Show popping image immediately
-  alert('.بادکنک شما ترکید');  // Show explosion message after pop image
-  startCountdown(6);  // Start 6 second countdown after explosion
-}
-
-// Start Countdown
-function startCountdown(seconds) {
-  countdownElement.innerText = seconds;  // Show countdown
-  const countdownInterval = setInterval(() => {
-    seconds--;
-    countdownElement.innerText = seconds;  // Update countdown
-    if (seconds <= 0) {
-      clearInterval(countdownInterval);  // Stop countdown
-      setTimeout(nextBalloon, 1000);  // Go to next balloon after countdown
+    if (rand < popChance || inflateCount >= 64) {
+      handlePop();
+    } else {
+      setInflateCount((prev) => prev + 1);
+      setBalloonScore((prev) => prev + 5);
+      setBalloonSize((prev) => prev + 10);
     }
-  }, 1000);
-}
+  };
 
-// Go to next Balloon
-function nextBalloon() {
-  balloonNumber++;  // Next balloon
-  if (balloonNumber > totalBalloons) {
-    alert('Game Over!');
-    saveData();  // Save data when game finishes
-  } else {
-    balloon.src = 'Balloon1.png';  // Reset balloon image
-    isExploded = false;  // Reset explosion status
-    pumpCount = 0;  // Reset pump count
-    collectedPoints = false;  // Reset collection flag
-    updateDisplay();
-    countdownElement.innerText = '';  // Clear countdown
-  }
-}
+  const handlePop = () => {
+    setBalloonPopped(true);
+    setMessage("بادکنک شما ترکید");
+    saveBalloonData(0, true);
+    startCountdown();
+  };
 
-// Collect Points
-function collectPoints() {
-  if (!isExploded && !collectedPoints) {
-    score += 20;  // Add points
-    collectedPoints = true;  // Mark that the participant has collected points
-    alert('شما 20 امتیاز به دست آوردید');  // Show collect message
-    setTimeout(nextBalloon, 1000);  // Go to next balloon
-  }
-}
+  const handleCollect = () => {
+    if (balloonPopped || isWaiting) return;
+    setTotalScore((prev) => prev + balloonScore);
+    setMessage(`شما ${balloonScore} امتیاز به دست آوردید`);
+    saveBalloonData(balloonScore, false);
+    startCountdown();
+  };
 
-// Save game data as CSV
-function saveData() {
-  let data = [];
-  for (let i = 0; i < balloonPumps.length; i++) {
-    data.push([
-      i + 1,  // Balloon number
-      balloonPumps[i].timePerPump.join(','),  // Time per pump
-      balloonPumps[i].avgTimePerPump,  // Average time per pump
-      balloonPumps[i].exploded,  // Exploded or not
-      balloonPumps[i].points,  // Points earned
-      balloonPumps[i].totalTime,  // Total time spent
-      balloonPumps[i].pumps,  // Number of pumps
-      balloonPumps[i].deviation // Deviation from 64
+  const saveBalloonData = (score, popped) => {
+    const meanPumpTime = pumpTimes.reduce((a, b) => a + b, 0) / (pumpTimes.length || 1);
+    setData((prev) => [
+      ...prev,
+      {
+        balloonNumber: currentBalloon,
+        totalPumps: inflateCount,
+        score,
+        popped: popped ? "ترکیده" : "نترکیده",
+        totalTime: pumpTimes.reduce((a, b) => a + b, 0),
+        meanPumpTime,
+        pumpDeviationFrom32: inflateCount - 32,
+        eachPumpTimes: pumpTimes.join(", ")
+      }
     ]);
-  }
+  };
 
-  let csvContent = 'Balloon,TimePerPump,AvgTimePerPump,Exploded,Points,TotalTime,Pumps,Deviation\n';
-  data.forEach((row) => {
-    csvContent += row.join(',') + '\n';
-  });
+  const startCountdown = () => {
+    setIsWaiting(true);
+    let counter = 6;
+    const interval = setInterval(() => {
+      counter--;
+      setCountdown(counter);
+      if (counter === 0) {
+        clearInterval(interval);
+        nextBalloon();
+      }
+    }, 1000);
+  };
 
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'BART_Game_Data.csv';
-  link.click();
+  const nextBalloon = () => {
+    if (currentBalloon >= totalBalloons) {
+      downloadExcel();
+      return;
+    }
+    setCurrentBalloon((prev) => prev + 1);
+    setInflateCount(0);
+    setBalloonScore(0);
+    setBalloonSize(150);
+    setBalloonPopped(false);
+    setMessage("");
+    setCountdown(6);
+    setIsWaiting(false);
+    setPumpTimes([]);
+    setPumpStart(null);
+  };
+
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "BART Data");
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const fileData = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(fileData, "bart_data.xlsx");
+  };
+
+  return (
+    <div
+      className="min-h-screen flex flex-col items-center justify-start p-8 bg-cover bg-center"
+      style={{ backgroundImage: "url('/a_peaceful_cartoon_landscape_background_for_a_psyc.png')" }}
+    >
+      <h1 className="text-4xl font-bold mb-4">بیشترین امتیاز رو بیار</h1>
+
+      <div className="flex space-x-4 mb-4">
+        <Button onClick={handlePump} disabled={isWaiting}>باد کردن</Button>
+        <Button onClick={handleCollect} disabled={isWaiting}>جمع کردن</Button>
+      </div>
+
+      <div className="relative w-64 h-64 flex justify-center items-center">
+        {balloonPopped ? (
+          <img src="/pop.png" alt="ترکید" className="w-32 h-32" />
+        ) : (
+          <img
+            src="/Balloon1.png"
+            alt="بادکنک"
+            style={{ width: balloonSize, height: balloonSize }}
+          />
+        )}
+      </div>
+
+      <div className="mt-4 text-center text-xl">
+        <p>{message}</p>
+        {isWaiting && <p>شروع در: {countdown}</p>}
+      </div>
+
+      <div className="absolute top-4 right-4 text-right space-y-2">
+        <p>مجموع امتیاز شما: {totalScore}</p>
+        <p>شمارنده‌ی باد: {inflateCount}</p>
+        <p>بادکنک {currentBalloon} از 45 بادکنک</p>
+      </div>
+    </div>
+  );
 }
-
-// Key event listeners for keyboard interaction
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    inflateBalloon();  // Inflate balloon on Enter
-  } else if (e.key === ' ') {
-    collectPoints();  // Collect points on Space
-  }
-});
-
-// Initialize game
-updateDisplay();
-inflateButton.onclick = inflateBalloon;  // Inflate button click
-collectButton.onclick = collectPoints;  // Collect button click
-
-</script>
-
-</body>
-</html>
