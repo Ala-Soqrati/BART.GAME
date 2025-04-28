@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('background1.png');
+            background-image: url('backgroundimage2.png'); /* Changed background image */
             background-size: cover;
             text-align: center;
             color: white;
@@ -29,7 +29,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 14px;
+            font-size: 42px; /* Increased font size by 3 times */
             text-align: right;
         }
 
@@ -63,6 +63,13 @@
         .score-text {
             font-size: 12px;
         }
+
+        /* Countdown style */
+        #countdown {
+            font-size: 40px;
+            color: red;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -82,18 +89,18 @@
     </div>
     
     <img id="balloon" src="Balloon1.png" alt="Balloon">
+    <div id="countdown"></div> <!-- Countdown element -->
 </div>
 
 <script>
 // BART Game Code
 
 // Required HTML Elements
-const background = document.getElementById('background');
 const balloon = document.getElementById('balloon');
 const scoreElement = document.getElementById('score');
 const pumpCounterElement = document.getElementById('pumpCounter');
 const balloonNumberElement = document.getElementById('balloonNumber');
-const gameTitle = document.getElementById('gameTitle');
+const countdownElement = document.getElementById('countdown');
 const inflateButton = document.getElementById('inflateButton');
 const collectButton = document.getElementById('collectButton');
 
@@ -102,7 +109,6 @@ let pumpCount = 0;
 let balloonNumber = 1;
 let totalBalloons = 45;
 let isExploded = false;
-let balloonPumps = [];
 let explosionProbability = 1 / 64;
 let startTime = 0;
 let elapsedTime = 0;
@@ -142,7 +148,20 @@ function balloonExploded() {
   isExploded = true;
   balloon.src = 'pop.png';  // Show popping image
   alert('.بادکنک شما ترکید');  // Show explosion message
-  setTimeout(nextBalloon, 1000);  // Go to next balloon
+  startCountdown(6);  // Start 6 second countdown after explosion
+}
+
+// Start Countdown
+function startCountdown(seconds) {
+  countdownElement.innerText = seconds;  // Show countdown
+  const countdownInterval = setInterval(() => {
+    seconds--;
+    countdownElement.innerText = seconds;  // Update countdown
+    if (seconds <= 0) {
+      clearInterval(countdownInterval);  // Stop countdown
+      setTimeout(nextBalloon, 1000);  // Go to next balloon after countdown
+    }
+  }, 1000);
 }
 
 // Go to next Balloon
@@ -156,6 +175,7 @@ function nextBalloon() {
     isExploded = false;  // Reset explosion status
     pumpCount = 0;  // Reset pump count
     updateDisplay();
+    countdownElement.innerText = '';  // Clear countdown
   }
 }
 
@@ -206,10 +226,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Initialize game
-gameTitle.innerText = 'بیشترین امتیاز رو بیار';  // Set game title
+updateDisplay();
 inflateButton.onclick = inflateBalloon;  // Inflate button click
 collectButton.onclick = collectPoints;  // Collect button click
-updateDisplay();
+
 </script>
 
 </body>
