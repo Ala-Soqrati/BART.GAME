@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('background2.png'); /* Changed background image */
+            background-image: url('background3.png'); /* Changed background image */
             background-size: cover;
             text-align: center;
             color: white;
@@ -147,8 +147,8 @@ function checkExplosion() {
 // Balloon Exploded
 function balloonExploded() {
   isExploded = true;
-  balloon.src = 'pop.png';  // Show popping image
-  alert('.بادکنک شما ترکید');  // Show explosion message
+  balloon.src = 'pop.png';  // Show popping image immediately
+  alert('.بادکنک شما ترکید');  // Show explosion message after pop image
   startCountdown(6);  // Start 6 second countdown after explosion
 }
 
