@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('backgroundimage2.png'); /* Changed background image */
+            background-image: url('background2.png'); /* Changed background image */
             background-size: cover;
             text-align: center;
             color: white;
@@ -113,6 +113,7 @@ let explosionProbability = 1 / 64;
 let startTime = 0;
 let elapsedTime = 0;
 let timePerPump = [];
+let collectedPoints = false;  // Track if the participant has collected points before explosion
 
 // Update the score, pump counter and balloon number display
 function updateDisplay() {
@@ -174,6 +175,7 @@ function nextBalloon() {
     balloon.src = 'Balloon1.png';  // Reset balloon image
     isExploded = false;  // Reset explosion status
     pumpCount = 0;  // Reset pump count
+    collectedPoints = false;  // Reset collection flag
     updateDisplay();
     countdownElement.innerText = '';  // Clear countdown
   }
@@ -181,8 +183,9 @@ function nextBalloon() {
 
 // Collect Points
 function collectPoints() {
-  if (!isExploded) {
+  if (!isExploded && !collectedPoints) {
     score += 20;  // Add points
+    collectedPoints = true;  // Mark that the participant has collected points
     alert('شما 20 امتیاز به دست آوردید');  // Show collect message
     setTimeout(nextBalloon, 1000);  // Go to next balloon
   }
