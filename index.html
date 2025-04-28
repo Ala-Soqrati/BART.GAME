@@ -2,39 +2,77 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>مسابقه‌ی بادکنک</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی بادکنک</title>
   <style>
     body {
       background-image: url('background.png');
       background-size: cover;
       font-family: Tahoma, sans-serif;
-      text-align: center;
-      padding-top: 30px;
+      text-align: right;
+      padding: 20px;
       color: #333;
+      margin: 0;
     }
+
     #balloon {
       width: 150px;
       transition: width 0.3s, height 0.3s;
     }
+
     #buttons {
       margin-top: 20px;
     }
+
     button {
-      font-size: 20px;
-      padding: 10px 20px;
+      font-size: 18px;
+      padding: 8px 16px;
       margin: 10px;
       cursor: pointer;
+      width: 120px;
     }
+
     #counter, #score, #balloonNumber {
-      margin-top: 20px;
-      font-size: 24px;
+      margin-top: 10px;
+      font-size: 18px;
       font-weight: bold;
     }
+
     #message, #countdown {
       margin-top: 20px;
-      font-size: 28px;
+      font-size: 22px;
       color: red;
       font-weight: bold;
+    }
+
+    /* Right-aligned texts */
+    .text-right {
+      text-align: right;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      #balloon {
+        width: 120px;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 6px 12px;
+        width: 100px;
+      }
+
+      #counter, #score, #balloonNumber {
+        font-size: 16px;
+      }
+
+      #message, #countdown {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -43,16 +81,16 @@
   <h1>بازی بادکنک</h1>
   <img id="balloon" src="Balloon2.png" alt="Balloon">
   
-  <div id="buttons">
+  <div id="buttons" class="text-right">
     <button onclick="pumpBalloon()">باد کردن</button>
     <button onclick="collectPoints()">جمع کردن</button>
   </div>
 
-  <div id="counter">شمارنده: 0</div>
-  <div id="score">امتیاز: 0</div>
-  <div id="balloonNumber">شماره بادکنک: 1/45</div>
-  <div id="message"></div>
-  <div id="countdown"></div>
+  <div id="counter" class="text-right">شمارنده: 0</div>
+  <div id="score" class="text-right">امتیاز: 0</div>
+  <div id="balloonNumber" class="text-right">شماره بادکنک: 1/45</div>
+  <div id="message" class="text-right"></div>
+  <div id="countdown" class="text-right"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -93,6 +131,9 @@
       document.getElementById('score').innerText = `امتیاز: ${points}`;
       
       balloonWidth += 10;
+      if (balloonWidth > 300) {
+        balloonWidth = 300;  // Limit the balloon size
+      }
       document.getElementById('balloon').style.width = balloonWidth + 'px';
       
       const timePerPump = (pumpStart - startTime) / 1000;
@@ -154,7 +195,7 @@
 
       balloonData.push({
         "شماره بادکنک": balloonIndex,
-        "آیا ترکید؟": exploded ? "ترکید" : "نترکید",
+        "آیا ترکید؟": exploded ? "ترکید" : "ترک نکرد",
         "امتیاز کسب شده": points,
         "تعداد باد کردن": pumpCount,
         "زمان کل (ثانیه)": totalTime,
@@ -182,6 +223,13 @@
     }
 
     resetBalloon();
+
+    // Listen for the Enter key press to inflate the balloon
+    window.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        pumpBalloon(); // Inflate the balloon on Enter key press
+      }
+    });
   </script>
 
 </body>
