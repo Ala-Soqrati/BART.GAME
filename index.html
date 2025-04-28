@@ -42,21 +42,15 @@
     }
     .balloon {
       position: relative;
-      margin-top: 20px;
+      margin-top: 30px;
     }
     .balloon img {
       transition: width 0.3s, height 0.3s;
     }
-    .score-above {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
+    .current-score {
+      margin-top: 10px;
       font-size: 20px;
       font-weight: bold;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 5px 10px;
-      border-radius: 10px;
     }
     .message {
       margin-top: 20px;
@@ -75,8 +69,9 @@
   <button id="collectBtn">جمع کردن</button>
 </div>
 
+<div class="current-score" id="balloonScoreDisplay">0 امتیاز</div>
+
 <div class="balloon">
-  <div class="score-above" id="balloonScoreDisplay">0</div>
   <img id="balloonImg" src="Balloon1.png" width="150" height="150" alt="Balloon">
 </div>
 
@@ -125,25 +120,24 @@ function pumpBalloon() {
   } else {
     inflateCount++;
     balloonScore += 5;
-    balloonSize += 5;  // 🔥 افزایش اندازه کمتر شد
+    balloonSize += 5;  // افزایش کندتر سایز
     updateBalloon();
   }
 }
 
 function popBalloon() {
   balloonPopped = true;
-  showMessage('بادکنک شما ترکید');
   document.getElementById('balloonImg').src = 'pop.png';
   saveData(0, 'ترکیده');
-  startCountdown();
+  startCountdown(true); // بادکنک ترکیده
 }
 
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
-  showMessage(`شما ${balloonScore} امتیاز به دست آوردید`);
+  showMessage(`شما ${balloonScore} امتیاز بردید`);
   saveData(balloonScore, 'نترکیده');
-  startCountdown();
+  startCountdown(false); // بادکنک نترکیده
 }
 
 function updateBalloon() {
@@ -152,7 +146,7 @@ function updateBalloon() {
   balloon.height = balloonSize;
   document.getElementById('inflateCount').innerText = inflateCount;
   document.getElementById('totalScore').innerText = totalScore;
-  document.getElementById('balloonScoreDisplay').innerText = balloonScore;
+  document.getElementById('balloonScoreDisplay').innerText = `${balloonScore} امتیاز`;
 }
 
 function showMessage(msg) {
@@ -174,14 +168,14 @@ function saveData(score, status) {
   });
 }
 
-function startCountdown() {
+function startCountdown(isPopped) {
   isWaiting = true;
   let counter = 6;
-  showMessage('بادکنک شما ترکید\nشروع در: ' + counter);
+  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${counter}` : `شروع در: ${counter}`);
   const interval = setInterval(() => {
     counter--;
     if (counter > 0) {
-      showMessage('بادکنک شما ترکید\nشروع در: ' + counter);
+      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${counter}` : `شروع در: ${counter}`);
     } else {
       clearInterval(interval);
       nextBalloon();
@@ -207,7 +201,7 @@ function nextBalloon() {
   updateBalloon();
   document.getElementById('inflateCount').innerText = inflateCount;
   document.getElementById('balloonNumber').innerText = balloonNumber;
-  document.getElementById('balloonScoreDisplay').innerText = 0;
+  document.getElementById('balloonScoreDisplay').innerText = `0 امتیاز`;
   showMessage('');
 }
 
