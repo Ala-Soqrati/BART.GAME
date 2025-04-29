@@ -33,9 +33,9 @@
       margin: 20px;
     }
     button {
-      padding: 15px 30px; /* دکمه‌ها 1.5 برابر شدند */
+      padding: 12px 24px; /* دکمه‌ها 1/25 کاهش داده شد */
       margin: 0 10px;
-      font-size: 27px; /* اندازه فونت دکمه‌ها بیشتر شد */
+      font-size: 24px; /* اندازه فونت دکمه‌ها کاهش یافت */
       cursor: pointer;
       font-weight: bold;
       font-family: Calibri, sans-serif;
@@ -113,7 +113,8 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
   pumpStart = now;
 
-  const popChance = 1 / (68 - inflateCount);
+  // احتمال ترکیدن بادکنک طبق شماره بادکنک و فرمول جدید
+  const popChance = 1 / (64 - balloonNumber);
   const rand = Math.random();
 
   if (rand < popChance || inflateCount >= 64) {
