@@ -60,27 +60,34 @@
       height: 50px;
     }
 
-    /* افزایش سایز برای موبایل */
+    /* تغییرات برای موبایل */
     @media (max-width: 768px) {
       body {
-        font-size: 1.2em;  /* افزایش اندازه به مقداری بیشتر از حالت قبلی */
-        padding: 30px;
+        font-size: 1em;  /* کاهش اندازه فونت */
+        padding: 15px;   /* کاهش padding */
       }
       .header {
-        font-size: 38px;  /* بزرگتر از حالت قبلی */
+        font-size: 24px;  /* کاهش اندازه فونت */
+        margin-bottom: 15px;
       }
-      .buttons button {
-        padding: 18px 36px;
-        font-size: 32px;
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;  /* فاصله بین دکمه‌ها */
+        flex-wrap: wrap;
+      }
+      button {
+        padding: 12px 20px;  /* کاهش padding دکمه‌ها */
+        font-size: 20px;     /* کاهش اندازه فونت دکمه‌ها */
       }
       .current-score {
-        font-size: 24px;
+        font-size: 18px;     /* کاهش اندازه فونت */
       }
       .message {
-        font-size: 26px;
+        font-size: 20px;     /* کاهش اندازه فونت */
       }
       .info {
-        font-size: 22px;
+        font-size: 16px;     /* کاهش اندازه فونت */
       }
     }
   </style>
