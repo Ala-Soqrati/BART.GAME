@@ -113,8 +113,8 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
   pumpStart = now;
 
-  // احتمال ترکیدن بادکنک طبق شماره بادکنک و فرمول جدید
-  const popChance = 1 / (64 - balloonNumber);
+  // اصلاح احتمال ترکیدن بادکنک بر اساس شماره آن
+  const popChance = 1 / (64 - balloonNumber);  // اصلاح فرمول احتمال ترکیدن
   const rand = Math.random();
 
   if (rand < popChance || inflateCount >= 64) {
