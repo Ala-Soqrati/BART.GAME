@@ -33,9 +33,9 @@
       margin: 20px;
     }
     button {
-      padding: 12px 24px; /* دکمه‌ها 1/25 کاهش داده شد */
+      padding: 15px 30px; /* دکمه‌ها 1.5 برابر شدند */
       margin: 0 10px;
-      font-size: 24px; /* اندازه فونت دکمه‌ها کاهش یافت */
+      font-size: 27px; /* اندازه فونت دکمه‌ها بیشتر شد */
       cursor: pointer;
       font-weight: bold;
       font-family: Calibri, sans-serif;
@@ -95,7 +95,6 @@ let pumpTimes = [];
 let pumpStart = null;
 let data = [];
 const totalBalloons = 30;  // تعداد بادکنک‌ها به 30 تغییر کرد
-let currentPumps = 0;  // متغیر برای شمارش تعداد پمپ‌های هر بادکنک
 
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
@@ -114,15 +113,13 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
   pumpStart = now;
 
-  // محاسبه احتمال ترکیدن بادکنک برای هر راند و بادکنک
-  const popChance = 1 / (64 - balloonNumber + currentPumps);  // احتمال ترکیدن بر اساس شماره بادکنک و تعداد پمپ‌ها
+  const popChance = 1 / (68 - inflateCount);
   const rand = Math.random();
 
   if (rand < popChance || inflateCount >= 64) {
     popBalloon();
   } else {
     inflateCount++;
-    currentPumps++;  // افزایش تعداد پمپ‌های بادکنک
     balloonScore += 5;
     balloonSize += 5;  // افزایش کندتر سایز
     updateBalloon();
@@ -200,7 +197,6 @@ function nextBalloon() {
   isWaiting = false;
   pumpTimes = [];
   pumpStart = null;
-  currentPumps = 0;  // برای بادکنک بعدی شمارش پمپ‌ها از صفر شروع می‌شود
   
   document.getElementById('balloonImg').src = 'Balloon1.png';
   updateBalloon();
