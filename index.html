@@ -33,9 +33,9 @@
       margin: 20px;
     }
     button {
-      padding: 10px 20px;
+      padding: 15px 30px; /* دکمه‌ها 1.5 برابر شدند */
       margin: 0 10px;
-      font-size: 18px;
+      font-size: 27px; /* اندازه فونت دکمه‌ها بیشتر شد */
       cursor: pointer;
       font-weight: bold;
       font-family: Calibri, sans-serif;
@@ -80,7 +80,7 @@
 <div class="info">
   <div>مجموع امتیاز شما: <span id="totalScore">0</span></div>
   <div>شمارنده‌ی باد: <span id="inflateCount">0</span></div>
-  <div>بادکنک <span id="balloonNumber">1</span> از 45 بادکنک</div>
+  <div>بادکنک <span id="balloonNumber">1</span> از 30 بادکنک</div>
 </div>
 
 <script>
@@ -94,6 +94,7 @@ let isWaiting = false;
 let pumpTimes = [];
 let pumpStart = null;
 let data = [];
+const totalBalloons = 30;  // تعداد بادکنک‌ها به 30 تغییر کرد
 
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
@@ -109,7 +110,7 @@ function pumpBalloon() {
   if (!pumpStart) pumpStart = Date.now();
   
   let now = Date.now();
-  pumpTimes.push(now - pumpStart);
+  pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
   pumpStart = now;
 
   const popChance = 1 / (68 - inflateCount);
@@ -161,10 +162,10 @@ function saveData(score, status) {
     'تعداد پمپ': inflateCount,
     'امتیاز کسب شده': score,
     'ترکیده؟': status,
-    'کل زمان صرف شده': totalTime,
-    'میانگین زمان هر پمپ': meanPumpTime,
+    'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2), // زمان به ثانیه و با دو رقم اعشار
+    'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2), // زمان به ثانیه
     'انحراف تعداد پمپ از 32': inflateCount - 32,
-    'زمان هر پمپ': pumpTimes.join(', ')
+    'زمان هر پمپ (ثانیه)': pumpTimes.map(t => t.toFixed(2)).join(', ') // زمان‌ها به ثانیه
   });
 }
 
@@ -184,7 +185,7 @@ function startCountdown(isPopped) {
 }
 
 function nextBalloon() {
-  if (balloonNumber >= 45) {
+  if (balloonNumber >= totalBalloons) {
     downloadExcel();
     return;
   }
