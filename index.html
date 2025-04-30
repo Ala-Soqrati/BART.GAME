@@ -170,7 +170,7 @@ function popBalloon() {
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
-  showMessage(`شما ${balloonScore} امتیاز بردید`);  // نمایش پیام "شما x امتیاز بردید"
+  showMessage(`شما ${balloonScore} امتیاز بردید`);
   saveData(balloonScore, 'نترکیده');
   startCountdown(false); // بادکنک نترکیده
 }
@@ -205,7 +205,7 @@ function saveData(score, status) {
 
 function startCountdown(isPopped) {
   isWaiting = true;
-  let counter = 6;  // شروع شمارش معکوس از 6 ثانیه
+  let counter = 6;
   showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${counter}` : `شروع در: ${counter}`);
   const interval = setInterval(() => {
     counter--;
