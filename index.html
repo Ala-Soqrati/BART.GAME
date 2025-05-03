@@ -146,7 +146,13 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
   pumpStart = now;
 
-  const popChance = 1 / (64 - inflateCount); // تغییر در فرمول احتمال ترکیدن
+  // احتمال ترکیدن در پمپ‌های اول تا دهم
+  let popChance = 1 / (64 - inflateCount); // مقدار اولیه احتمال ترکیدن
+  
+  // اگر تعداد پمپ‌ها کمتر از یا برابر 10 باشد، احتمال را نصف می‌کنیم
+  if (inflateCount < 10) {
+    popChance /= 2;
+  }
 
   const rand = Math.random();
 
