@@ -147,7 +147,7 @@ function pumpBalloon() {
   pumpStart = now;
 
   // احتمال ترکیدن در پمپ‌های اول تا دهم
-  let popChance = 1 / (64 - inflateCount); // مقدار اولیه احتمال ترکیدن
+  let popChance = 1 / (32 - inflateCount); // مقدار اولیه احتمال ترکیدن
   
   // اگر تعداد پمپ‌ها کمتر از یا برابر 10 باشد، احتمال را نصف می‌کنیم
   if (inflateCount < 10) {
@@ -156,7 +156,7 @@ function pumpBalloon() {
 
   const rand = Math.random();
 
-  if (rand < popChance || inflateCount >= 64) {
+  if (rand < popChance || inflateCount >= 32) {
     popBalloon();
   } else {
     inflateCount++;
