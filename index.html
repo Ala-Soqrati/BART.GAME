@@ -34,9 +34,9 @@
       margin: 20px;
     }
     button {
-      padding: 15px 30px; /* دکمه‌ها */
+      padding: 15px 30px;
       margin: 0 10px;
-      font-size: 27px; /* اندازه فونت دکمه‌ها */
+      font-size: 27px;
       cursor: pointer;
       font-weight: bold;
       font-family: Calibri, sans-serif;
@@ -60,35 +60,34 @@
       height: 50px;
     }
 
-    /* تغییرات برای موبایل */
     @media (max-width: 768px) {
       body {
-        font-size: 1em;  /* کاهش اندازه فونت */
-        padding: 15px;   /* کاهش padding */
+        font-size: 1em;
+        padding: 15px;
       }
       .header {
-        font-size: 24px;  /* کاهش اندازه فونت */
-        margin-bottom: 30px; /* افزایش فاصله بین تیتر و سایر المان‌ها */
-        text-align: left;  /* چپ‌چین کردن تیتر */
+        font-size: 24px;
+        margin-bottom: 30px;
+        text-align: left;
       }
       .buttons {
         display: flex;
         justify-content: center;
-        gap: 10px;  /* فاصله بین دکمه‌ها */
+        gap: 10px;
         flex-wrap: wrap;
       }
       button {
-        padding: 12px 20px;  /* کاهش padding دکمه‌ها */
-        font-size: 20px;     /* کاهش اندازه فونت دکمه‌ها */
+        padding: 12px 20px;
+        font-size: 20px;
       }
       .current-score {
-        font-size: 18px;     /* کاهش اندازه فونت */
+        font-size: 18px;
       }
       .message {
-        font-size: 20px;     /* کاهش اندازه فونت */
+        font-size: 20px;
       }
       .info {
-        font-size: 16px;     /* کاهش اندازه فونت */
+        font-size: 16px;
       }
     }
   </style>
@@ -127,7 +126,7 @@ let isWaiting = false;
 let pumpTimes = [];
 let pumpStart = null;
 let data = [];
-const totalBalloons = 30;  // تعداد بادکنک‌ها به 30 تغییر کرد
+const totalBalloons = 30;
 
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
@@ -141,21 +140,21 @@ document.addEventListener('keydown', function(e) {
 function pumpBalloon() {
   if (balloonPopped || isWaiting) return;
   if (!pumpStart) pumpStart = Date.now();
- 
+
   let now = Date.now();
-  pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
+  pumpTimes.push((now - pumpStart) / 1000);
   pumpStart = now;
 
-  const popChance = 1 / (32 - inflateCount); // تغییر در فرمول احتمال ترکیدن
+  const popChance = inflateCount === 0 ? 0 : 1 / (64 - inflateCount); // تغییر: صفر بودن احتمال ترکیدن در اولین پمپ
 
   const rand = Math.random();
 
-  if (rand < popChance || inflateCount >= 32) {
+  if (rand < popChance || inflateCount >= 64) {
     popBalloon();
   } else {
     inflateCount++;
     balloonScore += 5;
-    balloonSize += 5;  // افزایش کندتر سایز
+    balloonSize += 5;
     updateBalloon();
   }
 }
@@ -164,15 +163,16 @@ function popBalloon() {
   balloonPopped = true;
   document.getElementById('balloonImg').src = 'pop.png';
   saveData(0, 'ترکیده');
-  startCountdown(true); // بادکنک ترکیده
+  startCountdown(true);
 }
 
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
   showMessage(`شما ${balloonScore} امتیاز بردید`);
+  document.getElementById('balloonScoreDisplay').style.color = 'green'; // تغییر: رنگ سبز هنگام جمع‌کردن امتیاز
   saveData(balloonScore, 'نترکیده');
-  startCountdown(false); // بادکنک نترکیده
+  startCountdown(false);
 }
 
 function updateBalloon() {
@@ -196,10 +196,10 @@ function saveData(score, status) {
     'تعداد پمپ': inflateCount,
     'امتیاز کسب شده': score,
     'ترکیده؟': status,
-    'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2), // زمان به ثانیه و با دو رقم اعشار
-    'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2), // زمان به ثانیه
+    'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2),
+    'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2),
     'انحراف تعداد پمپ از 32': inflateCount - 32,
-    'زمان هر پمپ (ثانیه)': pumpTimes.map(t => t.toFixed(2)).join(', ') // زمان‌ها به ثانیه
+    'زمان هر پمپ (ثانیه)': pumpTimes.map(t => t.toFixed(2)).join(', ')
   });
 }
 
@@ -231,12 +231,13 @@ function nextBalloon() {
   isWaiting = false;
   pumpTimes = [];
   pumpStart = null;
- 
+
   document.getElementById('balloonImg').src = 'Balloon1.png';
   updateBalloon();
   document.getElementById('inflateCount').innerText = inflateCount;
   document.getElementById('balloonNumber').innerText = balloonNumber;
-  document.getElementById('balloonScoreDisplay').innerText = `0 امتیاز`;
+  document.getElementById('balloonScoreDisplay').innerText = '0 امتیاز';
+  document.getElementById('balloonScoreDisplay').style.color = ''; // بازگشت رنگ به حالت پیش‌فرض
   showMessage('');
 }
 
