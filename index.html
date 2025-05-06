@@ -145,7 +145,7 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000);
   pumpStart = now;
 
-  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount); // تغییر: صفر بودن احتمال ترکیدن در اولین پمپ
+  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount); // صفر بودن احتمال ترکیدن در اولین پمپ
 
   const rand = Math.random();
 
@@ -153,7 +153,7 @@ function pumpBalloon() {
     popBalloon();
   } else {
     inflateCount++;
-    balloonScore += 5.000;
+    balloonScore += 5000;
     balloonSize += 5;
     updateBalloon();
   }
@@ -169,8 +169,8 @@ function popBalloon() {
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
-  showMessage(`شما ${balloonScore} تومان بردید`);
-  document.getElementById('balloonScoreDisplay').style.color = 'green'; // تغییر: رنگ سبز هنگام جمع‌کردن تومان
+  showMessage(`شما ${balloonScore.toLocaleString('fa-IR')} تومان بردید`); // تغییر اعمال شده
+  document.getElementById('balloonScoreDisplay').style.color = 'green';
   saveData(balloonScore, 'نترکیده');
   startCountdown(false);
 }
@@ -180,8 +180,8 @@ function updateBalloon() {
   balloon.width = balloonSize;
   balloon.height = balloonSize;
   document.getElementById('inflateCount').innerText = inflateCount;
-  document.getElementById('totalScore').innerText = totalScore;
-  document.getElementById('balloonScoreDisplay').innerText = `${balloonScore} تومان`;
+  document.getElementById('totalScore').innerText = totalScore.toLocaleString('fa-IR'); // تغییر اعمال شده
+  document.getElementById('balloonScoreDisplay').innerText = `${balloonScore.toLocaleString('fa-IR')} تومان`; // تغییر اعمال شده
 }
 
 function showMessage(msg) {
@@ -237,7 +237,7 @@ function nextBalloon() {
   document.getElementById('inflateCount').innerText = inflateCount;
   document.getElementById('balloonNumber').innerText = balloonNumber;
   document.getElementById('balloonScoreDisplay').innerText = '0 تومان';
-  document.getElementById('balloonScoreDisplay').style.color = ''; // بازگشت رنگ به حالت پیش‌فرض
+  document.getElementById('balloonScoreDisplay').style.color = '';
   showMessage('');
 }
 
