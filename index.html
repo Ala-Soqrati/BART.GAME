@@ -101,7 +101,7 @@
   <button id="collectBtn">جمع کردن</button>
 </div>
 
-<div class="current-score" id="balloonScoreDisplay">0 تومان</div>
+<div class="current-score" id="balloonScoreDisplay">۰ تومان</div>
 
 <div class="balloon">
   <img id="balloonImg" src="Balloon1.png" width="150" height="150" alt="Balloon">
@@ -110,9 +110,9 @@
 <div class="message" id="message"></div>
 
 <div class="info">
-  <div>حساب شما: <span id="totalScore">0</span></div>
-  <div>شمارنده‌ : <span id="inflateCount">0</span></div>
-  <div>بادکنک <span id="balloonNumber">1</span> از 30 بادکنک</div>
+  <div>حساب شما: <span id="totalScore">۰</span></div>
+  <div>شمارنده‌ : <span id="inflateCount">۰</span></div>
+  <div>بادکنک <span id="balloonNumber">۱</span> از ۳۰ بادکنک</div>
 </div>
 
 <script>
@@ -127,6 +127,10 @@ let pumpTimes = [];
 let pumpStart = null;
 let data = [];
 const totalBalloons = 30;
+
+function toPersianDigits(n) {
+  return n.toLocaleString('fa-IR');
+}
 
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
@@ -145,7 +149,7 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000);
   pumpStart = now;
 
-  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount); // صفر بودن احتمال ترکیدن در اولین پمپ
+  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount);
 
   const rand = Math.random();
 
@@ -169,7 +173,7 @@ function popBalloon() {
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
-  showMessage(`شما ${balloonScore.toLocaleString('fa-IR')} تومان بردید`); // تغییر اعمال شده
+  showMessage(`شما ${toPersianDigits(balloonScore)} تومان بردید`);
   document.getElementById('balloonScoreDisplay').style.color = 'green';
   saveData(balloonScore, 'نترکیده');
   startCountdown(false);
@@ -179,9 +183,9 @@ function updateBalloon() {
   const balloon = document.getElementById('balloonImg');
   balloon.width = balloonSize;
   balloon.height = balloonSize;
-  document.getElementById('inflateCount').innerText = inflateCount;
-  document.getElementById('totalScore').innerText = totalScore.toLocaleString('fa-IR'); // تغییر اعمال شده
-  document.getElementById('balloonScoreDisplay').innerText = `${balloonScore.toLocaleString('fa-IR')} تومان`; // تغییر اعمال شده
+  document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
+  document.getElementById('totalScore').innerText = toPersianDigits(totalScore);
+  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
 }
 
 function showMessage(msg) {
@@ -206,11 +210,11 @@ function saveData(score, status) {
 function startCountdown(isPopped) {
   isWaiting = true;
   let counter = 6;
-  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${counter}` : `شروع در: ${counter}`);
+  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
   const interval = setInterval(() => {
     counter--;
     if (counter > 0) {
-      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${counter}` : `شروع در: ${counter}`);
+      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
     } else {
       clearInterval(interval);
       nextBalloon();
@@ -234,9 +238,9 @@ function nextBalloon() {
 
   document.getElementById('balloonImg').src = 'Balloon1.png';
   updateBalloon();
-  document.getElementById('inflateCount').innerText = inflateCount;
-  document.getElementById('balloonNumber').innerText = balloonNumber;
-  document.getElementById('balloonScoreDisplay').innerText = '0 تومان';
+  document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
+  document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
+  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(0)} تومان`;
   document.getElementById('balloonScoreDisplay').style.color = '';
   showMessage('');
 }
