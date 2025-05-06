@@ -141,18 +141,12 @@ document.addEventListener('keydown', function(e) {
 function pumpBalloon() {
   if (balloonPopped || isWaiting) return;
   if (!pumpStart) pumpStart = Date.now();
-  
+ 
   let now = Date.now();
   pumpTimes.push((now - pumpStart) / 1000); // زمان به ثانیه تبدیل شد
   pumpStart = now;
 
-  // احتمال ترکیدن در پمپ‌های اول تا دهم
-  let popChance = 1 / (32 - inflateCount); // مقدار اولیه احتمال ترکیدن
-  
-  // اگر تعداد پمپ‌ها کمتر از یا برابر 10 باشد، احتمال را نصف می‌کنیم
-  if (inflateCount < 10) {
-    popChance /= 2;
-  }
+  const popChance = 1 / (32 - inflateCount); // تغییر در فرمول احتمال ترکیدن
 
   const rand = Math.random();
 
@@ -237,7 +231,7 @@ function nextBalloon() {
   isWaiting = false;
   pumpTimes = [];
   pumpStart = null;
-  
+ 
   document.getElementById('balloonImg').src = 'Balloon1.png';
   updateBalloon();
   document.getElementById('inflateCount').innerText = inflateCount;
