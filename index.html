@@ -202,7 +202,7 @@ function saveData(score, status) {
     'ترکیده؟': status,
     'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2),
     'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2),
-    'انحراف تعداد پمپ از 32': inflateCount - 32,
+    'انحراف تعداد پمپ از 16': inflateCount - 16,
     'زمان هر پمپ (ثانیه)': pumpTimes.map(t => t.toFixed(2)).join(', ')
   });
 }
