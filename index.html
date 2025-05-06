@@ -145,11 +145,11 @@ function pumpBalloon() {
   pumpTimes.push((now - pumpStart) / 1000);
   pumpStart = now;
 
-  const popChance = inflateCount === 0 ? 0 : 1 / (64 - inflateCount); // تغییر: صفر بودن احتمال ترکیدن در اولین پمپ
+  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount); // تغییر: صفر بودن احتمال ترکیدن در اولین پمپ
 
   const rand = Math.random();
 
-  if (rand < popChance || inflateCount >= 64) {
+  if (rand < popChance || inflateCount >= 32) {
     popBalloon();
   } else {
     inflateCount++;
