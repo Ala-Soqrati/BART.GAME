@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>بیشترین امتیاز رو بیار</title>
+  <title>بادکنک پولی</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
@@ -94,14 +94,14 @@
 </head>
 <body>
 
-<div class="header">بیشترین امتیاز رو بیار</div>
+<div class="header">بادکنک پولی</div>
 
 <div class="buttons">
   <button id="pumpBtn">باد کردن</button>
   <button id="collectBtn">جمع کردن</button>
 </div>
 
-<div class="current-score" id="balloonScoreDisplay">0 امتیاز</div>
+<div class="current-score" id="balloonScoreDisplay">0 تومان</div>
 
 <div class="balloon">
   <img id="balloonImg" src="Balloon1.png" width="150" height="150" alt="Balloon">
@@ -110,8 +110,8 @@
 <div class="message" id="message"></div>
 
 <div class="info">
-  <div>مجموع امتیاز شما: <span id="totalScore">0</span></div>
-  <div>شمارنده‌ی باد: <span id="inflateCount">0</span></div>
+  <div>حساب شما: <span id="totalScore">0</span></div>
+  <div>شمارنده‌ : <span id="inflateCount">0</span></div>
   <div>بادکنک <span id="balloonNumber">1</span> از 30 بادکنک</div>
 </div>
 
@@ -153,7 +153,7 @@ function pumpBalloon() {
     popBalloon();
   } else {
     inflateCount++;
-    balloonScore += 5;
+    balloonScore += 5000;
     balloonSize += 5;
     updateBalloon();
   }
@@ -169,8 +169,8 @@ function popBalloon() {
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
-  showMessage(`شما ${balloonScore} امتیاز بردید`);
-  document.getElementById('balloonScoreDisplay').style.color = 'green'; // تغییر: رنگ سبز هنگام جمع‌کردن امتیاز
+  showMessage(`شما ${balloonScore} تومان بردید`);
+  document.getElementById('balloonScoreDisplay').style.color = 'green'; // تغییر: رنگ سبز هنگام جمع‌کردن تومان
   saveData(balloonScore, 'نترکیده');
   startCountdown(false);
 }
@@ -181,7 +181,7 @@ function updateBalloon() {
   balloon.height = balloonSize;
   document.getElementById('inflateCount').innerText = inflateCount;
   document.getElementById('totalScore').innerText = totalScore;
-  document.getElementById('balloonScoreDisplay').innerText = `${balloonScore} امتیاز`;
+  document.getElementById('balloonScoreDisplay').innerText = `${balloonScore} تومان`;
 }
 
 function showMessage(msg) {
@@ -194,7 +194,7 @@ function saveData(score, status) {
   data.push({
     'بادکنک شماره': balloonNumber,
     'تعداد پمپ': inflateCount,
-    'امتیاز کسب شده': score,
+    'پول کسب شده': score,
     'ترکیده؟': status,
     'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2),
     'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2),
@@ -236,7 +236,7 @@ function nextBalloon() {
   updateBalloon();
   document.getElementById('inflateCount').innerText = inflateCount;
   document.getElementById('balloonNumber').innerText = balloonNumber;
-  document.getElementById('balloonScoreDisplay').innerText = '0 امتیاز';
+  document.getElementById('balloonScoreDisplay').innerText = '0 تومان';
   document.getElementById('balloonScoreDisplay').style.color = ''; // بازگشت رنگ به حالت پیش‌فرض
   showMessage('');
 }
