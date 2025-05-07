@@ -209,7 +209,7 @@ function saveData(score, status) {
 
 function startCountdown(isPopped) {
   isWaiting = true;
-  let counter = 0;
+  let counter = 4;
   showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
   const interval = setInterval(() => {
     counter--;
