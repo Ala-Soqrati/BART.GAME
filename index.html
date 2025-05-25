@@ -60,7 +60,17 @@
       height: 50px;
     }
     .intro-form {
+      position: relative;
+      z-index: 10;
       margin-bottom: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+    .intro-form p {
+      font-weight: bold;
+      font-size: 20px;
     }
     input[type="text"] {
       font-size: 20px;
@@ -68,6 +78,14 @@
       text-align: center;
       width: 300px;
       direction: ltr;
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 5;
     }
 
     @media (max-width: 768px) {
@@ -104,9 +122,11 @@
 </head>
 <body>
 
+<div class="overlay" id="overlay"></div>
+
 <div class="header">بادکنک پولی</div>
 
-<div class="intro-form">
+<div class="intro-form" id="introForm">
   <p>کد اختصاصی شما عبارت است از حرف اول نام شما به زبان انگلیسی، حرف اول نام خانوادگی شما به زبان انگلیسی و درنهایت دو رقم آخر شماره تلفن شما</p>
   <input type="text" id="userCodeInput" placeholder="مثال: AH45" maxlength="10">
   <br><br>
@@ -157,8 +177,10 @@ function startGame() {
     return;
   }
   userCode = input;
-  document.getElementById('userCodeInput').disabled = true;
-  document.querySelector('.intro-form button').disabled = true;
+  // پنهان‌سازی فرم و لایه تار
+  document.getElementById('introForm').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+  // فعال‌سازی دکمه‌ها
   document.getElementById('pumpBtn').disabled = false;
   document.getElementById('collectBtn').disabled = false;
   showMessage("بازی شروع شد!");
