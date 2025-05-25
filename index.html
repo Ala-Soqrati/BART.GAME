@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>بادکنک پولی</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     body {
       background: url('background7.png') no-repeat center center fixed;
       background-size: cover;
-      font-family: Calibri, sans-serif;
+      font-family: 'Vazirmatn', sans-serif;
       text-align: center;
       padding: 20px;
     }
@@ -39,7 +40,7 @@
       font-size: 27px;
       cursor: pointer;
       font-weight: bold;
-      font-family: Calibri, sans-serif;
+      font-family: 'Vazirmatn', sans-serif;
     }
     .balloon {
       position: relative;
@@ -78,6 +79,7 @@
       text-align: center;
       width: 300px;
       direction: ltr;
+      font-family: 'Vazirmatn', sans-serif;
     }
     .overlay {
       position: fixed;
@@ -127,7 +129,7 @@
 <div class="header">بادکنک پولی</div>
 
 <div class="intro-form" id="introForm">
-  <p>لطفاً ابتدا کد اختصاصی خود را وارد نمایید</p>
+  <p>لطفاً ابتدا کد اختصاصی خود را وارد نمایید.</p>
   <input type="text" id="userCodeInput" placeholder="مثال: AH45" maxlength="10">
   <br><br>
   <button onclick="startGame()">شروع بازی</button>
@@ -177,10 +179,8 @@ function startGame() {
     return;
   }
   userCode = input;
-  // پنهان‌سازی فرم و لایه تار
   document.getElementById('introForm').style.display = 'none';
   document.getElementById('overlay').style.display = 'none';
-  // فعال‌سازی دکمه‌ها
   document.getElementById('pumpBtn').disabled = false;
   document.getElementById('collectBtn').disabled = false;
   showMessage("بازی شروع شد!");
