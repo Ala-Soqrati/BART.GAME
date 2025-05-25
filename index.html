@@ -59,6 +59,16 @@
       font-weight: bold;
       height: 50px;
     }
+    .intro-form {
+      margin-bottom: 30px;
+    }
+    input[type="text"] {
+      font-size: 20px;
+      padding: 10px;
+      text-align: center;
+      width: 300px;
+      direction: ltr;
+    }
 
     @media (max-width: 768px) {
       body {
@@ -96,9 +106,16 @@
 
 <div class="header">بادکنک پولی</div>
 
+<div class="intro-form">
+  <p>کد اختصاصی شما عبارت است از حرف اول نام شما به زبان انگلیسی، حرف اول نام خانوادگی شما به زبان انگلیسی و درنهایت دو رقم آخر شماره تلفن شما</p>
+  <input type="text" id="userCodeInput" placeholder="مثال: AH45" maxlength="10">
+  <br><br>
+  <button onclick="startGame()">شروع بازی</button>
+</div>
+
 <div class="buttons">
-  <button id="pumpBtn">باد کردن</button>
-  <button id="collectBtn">جمع کردن</button>
+  <button id="pumpBtn" disabled>باد کردن</button>
+  <button id="collectBtn" disabled>جمع کردن</button>
 </div>
 
 <div class="current-score" id="balloonScoreDisplay">۰ تومان</div>
@@ -126,17 +143,32 @@ let isWaiting = false;
 let pumpTimes = [];
 let pumpStart = null;
 let data = [];
+let userCode = "";
 const totalBalloons = 30;
 
 function toPersianDigits(n) {
   return n.toLocaleString('fa-IR');
 }
 
+function startGame() {
+  const input = document.getElementById('userCodeInput').value.trim();
+  if (input === "") {
+    alert("لطفاً کد اختصاصی را وارد نمایید.");
+    return;
+  }
+  userCode = input;
+  document.getElementById('userCodeInput').disabled = true;
+  document.querySelector('.intro-form button').disabled = true;
+  document.getElementById('pumpBtn').disabled = false;
+  document.getElementById('collectBtn').disabled = false;
+  showMessage("بازی شروع شد!");
+}
+
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
 
 document.addEventListener('keydown', function(e) {
-  if (isWaiting) return;
+  if (isWaiting || document.getElementById('pumpBtn').disabled) return;
   if (e.key === 'Enter') pumpBalloon();
   if (e.code === 'Space') collectScore();
 });
@@ -150,7 +182,6 @@ function pumpBalloon() {
   pumpStart = now;
 
   const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount);
-
   const rand = Math.random();
 
   if (rand < popChance || inflateCount >= 32) {
@@ -196,6 +227,7 @@ function saveData(score, status) {
   let meanPumpTime = pumpTimes.reduce((a, b) => a + b, 0) / (pumpTimes.length || 1);
   let totalTime = pumpTimes.reduce((a, b) => a + b, 0);
   data.push({
+    'کد اختصاصی': userCode,
     'بادکنک شماره': balloonNumber,
     'تعداد پمپ': inflateCount,
     'پول کسب شده': score,
