@@ -166,7 +166,7 @@ let pumpTimes = [];
 let pumpStart = null;
 let data = [];
 let userCode = "";
-const totalBalloons = 2;
+const totalBalloons = 30;
 
 function toPersianDigits(n) {
   return n.toLocaleString('fa-IR');
@@ -300,43 +300,11 @@ function nextBalloon() {
 }
 
 function downloadExcel() {
-  // ساخت و دانلود فایل اکسل
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
   const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
-
-  // ارسال به فرم گوگل
-  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
-
-  data.forEach((entry, index) => {
-    setTimeout(() => {
-      const formData = new FormData();
-      formData.append("entry.322627286", entry['کد اختصاصی']);
-      formData.append("entry.574184555", entry['بادکنک شماره']);
-      formData.append("entry.355035596", entry['ترکیده؟']);
-      formData.append("entry.1832686006", entry['تعداد پمپ']);
-      formData.append("entry.1266799925", entry['پول کسب شده']);
-      formData.append("entry.548817805", entry['کل زمان صرف شده (ثانیه)']);
-      formData.append("entry.1593547984", entry['میانگین زمان هر پمپ (ثانیه)']);
-      formData.append("entry.1669638583", entry['انحراف تعداد پمپ از 16']);
-      formData.append("entry.1034198327", entry['زمان هر پمپ (ثانیه)']);
-
-      fetch(formUrl, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors"
-      }).then(() => {
-        console.log(`✅ ارسال ردیف ${index + 1}`);
-        if (index === data.length - 1) {
-          alert("✅ فایل اکسل دانلود شد و داده‌ها به فرم گوگل ارسال شدند.");
-        }
-      }).catch(err => {
-        console.error("❌ خطا در ارسال به فرم:", err);
-      });
-    }, index * 1000); // افزایش تأخیر به ۱ ثانیه برای اطمینان
-  });
 }
 </script>
 
