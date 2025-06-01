@@ -229,7 +229,7 @@ function updateBalloon() {
   balloon.height = balloonSize;
   document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
   document.getElementById('totalScore').innerText = toPersianDigits(totalScore);
-  document.getElementById('balloonScoreDisplay').innerText = ${toPersianDigits(balloonScore)} تومان;
+  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
 }
 
 function showMessage(msg) {
@@ -255,11 +255,11 @@ function saveData(score, status) {
 function startCountdown(isPopped) {
   isWaiting = true;
   let counter = 4;
-  showMessage(isPopped ? بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)} : شروع در: ${toPersianDigits(counter)});
+  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
   const interval = setInterval(() => {
     counter--;
     if (counter > 0) {
-      showMessage(isPopped ? بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)} : شروع در: ${toPersianDigits(counter)});
+      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
     } else {
       clearInterval(interval);
       nextBalloon();
@@ -285,7 +285,7 @@ function nextBalloon() {
   updateBalloon();
   document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
   document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
-  document.getElementById('balloonScoreDisplay').innerText = ${toPersianDigits(0)} تومان;
+  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(0)} تومان`;
   document.getElementById('balloonScoreDisplay').style.color = '';
   showMessage('');
 }
@@ -297,6 +297,16 @@ function downloadExcel() {
   const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
 }
+
+// ⛔ جلوگیری از double-tap zoom در آیفون
+let lastTouchTime = 0;
+document.addEventListener('touchend', function (e) {
+  const now = Date.now();
+  if (now - lastTouchTime <= 300) {
+    e.preventDefault();
+  }
+  lastTouchTime = now;
+}, false);
 </script>
 
 </body>
