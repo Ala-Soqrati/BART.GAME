@@ -5,20 +5,24 @@
   <title>تست ارسال به گوگل فرم</title>
 </head>
 <body>
+  <h2>تست ارسال به فرم Google</h2>
   <button onclick="sendTestToForm()">ارسال تست</button>
 
   <script>
     function sendTestToForm() {
-      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc4F0SNY7s1ZyoU4A_fPENZlXP60dB3WLiGkmCNHBaSFVFacw/viewform?usp=pp_url&entry.1004841166=1&entry.1364215517=1&entry.1477489144=1&entry.1241739633=1&entry.1764631706=%D8%AA%D8%B1%DA%A9%DB%8C%D8%AF&entry.1429971893=1&entry.1349933636=1&entry.1466503295=1&entry.197524038=1";
+      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
       const formData = new FormData();
-      formData.append("entry.1004841166", "تست_کاربر");
+      formData.append("entry.322627286", "تست_کاربر");
 
       fetch(formUrl, {
         method: "POST",
         body: formData,
         mode: "no-cors"
       }).then(() => {
-        alert("✅ داده تستی ارسال شد.");
+        alert("✅ داده تستی ارسال شد!");
+      }).catch((err) => {
+        alert("❌ خطا در ارسال");
+        console.error(err);
       });
     }
   </script>
