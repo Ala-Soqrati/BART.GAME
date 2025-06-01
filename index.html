@@ -223,22 +223,6 @@ function popBalloon() {
   startCountdown(true);
 }
 
-function collectScore() {
-  if (balloonPopped || isWaiting) return;
-  
-  totalScore += balloonScore;
-
-  // نمایش پیام موفقیت فقط اگر بادکنک نترکیده باشد
-  if (balloonScore > 0) {
-    showMessage(`شما ${toPersianDigits(balloonScore)} تومان بردید`);
-    document.getElementById('balloonScoreDisplay').style.color = 'green';
-  }
-
-  saveData(balloonScore, 'نترکیده');
-  startCountdown(false);
-}
-
-
 function updateBalloon() {
   const balloon = document.getElementById('balloonImg');
   balloon.width = balloonSize;
