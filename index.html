@@ -89,7 +89,30 @@
       background: rgba(0, 0, 0, 0.6);
       z-index: 5;
     }
-
+    #finalMessage {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 9999;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      flex-direction: column;
+    }
+    #finalMessage a {
+      color: yellow;
+      text-decoration: underline;
+      font-size: 20px;
+      margin-top: 15px;
+    }
     @media (max-width: 768px) {
       body {
         font-size: 1em;
@@ -152,6 +175,11 @@
   <div>حساب شما: <span id="totalScore">۰</span></div>
   <div>شمارنده‌ : <span id="inflateCount">۰</span></div>
   <div>بادکنک <span id="balloonNumber">۱</span> از ۳۰ بادکنک</div>
+</div>
+
+<div id="finalMessage">
+  لطفاً فایل اکسل را دانلود کنید و از طریق لینک زیر به پرسشنامه برگردید.
+  <a href="https://survey.porsline.ir/s/nZZwtoT7" target="_blank">بازگشت به پرسشنامه</a>
 </div>
 
 <script>
@@ -229,7 +257,7 @@ function updateBalloon() {
   balloon.height = balloonSize;
   document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
   document.getElementById('totalScore').innerText = toPersianDigits(totalScore);
-  document.getElementById('balloonScoreDisplay').innerText = ${toPersianDigits(balloonScore)} تومان;
+  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
 }
 
 function showMessage(msg) {
@@ -252,14 +280,21 @@ function saveData(score, status) {
   });
 }
 
+function collectScore() {
+  if (balloonPopped || isWaiting) return;
+  totalScore += balloonScore;
+  saveData(balloonScore, 'جمع شده');
+  startCountdown(false);
+}
+
 function startCountdown(isPopped) {
   isWaiting = true;
   let counter = 4;
-  showMessage(isPopped ? بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)} : شروع در: ${toPersianDigits(counter)});
+  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
   const interval = setInterval(() => {
     counter--;
     if (counter > 0) {
-      showMessage(isPopped ? بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)} : شروع در: ${toPersianDigits(counter)});
+      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
     } else {
       clearInterval(interval);
       nextBalloon();
@@ -285,7 +320,7 @@ function nextBalloon() {
   updateBalloon();
   document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
   document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
-  document.getElementById('balloonScoreDisplay').innerText = ${toPersianDigits(0)} تومان;
+  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(0)} تومان`;
   document.getElementById('balloonScoreDisplay').style.color = '';
   showMessage('');
 }
@@ -296,6 +331,9 @@ function downloadExcel() {
   XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
   const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
+
+  document.getElementById("finalMessage").style.display = "flex";
+  document.body.style.pointerEvents = "none";
 }
 </script>
 
