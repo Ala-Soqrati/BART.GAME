@@ -126,7 +126,7 @@
 
 <div class="overlay" id="overlay"></div>
 
-<div class="header">بادکنک پولی</div>
+<div class="header">بادکنک اقتصادی</div>
 
 <div class="intro-form" id="introForm">
   <p>لطفاً نام و نام خانوادگی خود را وارد نمایید.</p>
@@ -229,7 +229,7 @@ function collectScore() {
   showMessage(`شما ${toPersianDigits(balloonScore)} تومان بردید`);
   document.getElementById('balloonScoreDisplay').style.color = 'green';
   saveData(balloonScore, 'نترکیده');
-  startCountdown(false);
+  startCountdown(true);
 }
 
 function updateBalloon() {
