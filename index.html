@@ -4,14 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>بادکنک پولی</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     body {
       background: url('background7.png') no-repeat center center fixed;
       background-size: cover;
-      font-family: 'Vazirmatn', sans-serif;
+      font-family: Calibri, sans-serif;
       text-align: center;
       padding: 20px;
     }
@@ -40,7 +39,7 @@
       font-size: 27px;
       cursor: pointer;
       font-weight: bold;
-      font-family: 'Vazirmatn', sans-serif;
+      font-family: Calibri, sans-serif;
     }
     .balloon {
       position: relative;
@@ -59,35 +58,6 @@
       font-size: 22px;
       font-weight: bold;
       height: 50px;
-    }
-    .intro-form {
-      position: relative;
-      z-index: 10;
-      margin-bottom: 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      display: inline-block;
-    }
-    .intro-form p {
-      font-weight: bold;
-      font-size: 20px;
-    }
-    input[type="text"] {
-      font-size: 20px;
-      padding: 10px;
-      text-align: center;
-      width: 300px;
-      direction: ltr;
-      font-family: 'Vazirmatn', sans-serif;
-    }
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 5;
     }
 
     @media (max-width: 768px) {
@@ -124,20 +94,11 @@
 </head>
 <body>
 
-<div class="overlay" id="overlay"></div>
-
 <div class="header">بادکنک پولی</div>
 
-<div class="intro-form" id="introForm">
-  <p>کد اختصاصی شما عبارت است از حرف اول نام شما به زبان انگلیسی، حرف اول نام خانوادگی شما به زبان انگلیسی و درنهایت دو رقم آخر شماره تلفن شما</p>
-  <input type="text" id="userCodeInput" placeholder="مثال: AH45" maxlength="10">
-  <br><br>
-  <button onclick="startGame()">شروع بازی</button>
-</div>
-
 <div class="buttons">
-  <button id="pumpBtn" disabled>باد کردن</button>
-  <button id="collectBtn" disabled>جمع کردن</button>
+  <button id="pumpBtn">باد کردن</button>
+  <button id="collectBtn">جمع کردن</button>
 </div>
 
 <div class="current-score" id="balloonScoreDisplay">۰ تومان</div>
@@ -165,32 +126,17 @@ let isWaiting = false;
 let pumpTimes = [];
 let pumpStart = null;
 let data = [];
-let userCode = "";
-const totalBalloons = 2;
+const totalBalloons = 30;
 
 function toPersianDigits(n) {
   return n.toLocaleString('fa-IR');
-}
-
-function startGame() {
-  const input = document.getElementById('userCodeInput').value.trim();
-  if (input === "") {
-    alert("لطفاً کد اختصاصی را وارد نمایید.");
-    return;
-  }
-  userCode = input;
-  document.getElementById('introForm').style.display = 'none';
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('pumpBtn').disabled = false;
-  document.getElementById('collectBtn').disabled = false;
-  showMessage("بازی شروع شد!");
 }
 
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
 
 document.addEventListener('keydown', function(e) {
-  if (isWaiting || document.getElementById('pumpBtn').disabled) return;
+  if (isWaiting) return;
   if (e.key === 'Enter') pumpBalloon();
   if (e.code === 'Space') collectScore();
 });
@@ -204,6 +150,7 @@ function pumpBalloon() {
   pumpStart = now;
 
   const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount);
+
   const rand = Math.random();
 
   if (rand < popChance || inflateCount >= 32) {
@@ -226,7 +173,7 @@ function popBalloon() {
 function collectScore() {
   if (balloonPopped || isWaiting) return;
   totalScore += balloonScore;
-  showMessage(`شما ${toPersianDigits(balloonScore)} تومان بردید`);
+  showMessage(شما ${toPersianDigits(balloonScore)} تومان بردید);
   document.getElementById('balloonScoreDisplay').style.color = 'green';
   saveData(balloonScore, 'نترکیده');
   startCountdown(false);
@@ -238,7 +185,7 @@ function updateBalloon() {
   balloon.height = balloonSize;
   document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
   document.getElementById('totalScore').innerText = toPersianDigits(totalScore);
-  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
+  document.getElementById('balloonScoreDisplay').innerText = ${toPersianDigits(balloonScore)} تومان;
 }
 
 function showMessage(msg) {
@@ -249,7 +196,6 @@ function saveData(score, status) {
   let meanPumpTime = pumpTimes.reduce((a, b) => a + b, 0) / (pumpTimes.length || 1);
   let totalTime = pumpTimes.reduce((a, b) => a + b, 0);
   data.push({
-    'کد اختصاصی': userCode,
     'بادکنک شماره': balloonNumber,
     'تعداد پمپ': inflateCount,
     'پول کسب شده': score,
@@ -264,11 +210,11 @@ function saveData(score, status) {
 function startCountdown(isPopped) {
   isWaiting = true;
   let counter = 4;
-  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
+  showMessage(isPopped ? بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)} : شروع در: ${toPersianDigits(counter)});
   const interval = setInterval(() => {
     counter--;
     if (counter > 0) {
-      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
+      showMessage(isPopped ? بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)} : شروع در: ${toPersianDigits(counter)});
     } else {
       clearInterval(interval);
       nextBalloon();
@@ -278,34 +224,33 @@ function startCountdown(isPopped) {
 
 function nextBalloon() {
   if (balloonNumber >= totalBalloons) {
-  function downloadExcel() {
-  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
+    downloadExcel();
+    return;
+  }
+  balloonNumber++;
+  inflateCount = 0;
+  balloonScore = 0;
+  balloonSize = 150;
+  balloonPopped = false;
+  isWaiting = false;
+  pumpTimes = [];
+  pumpStart = null;
 
-  data.forEach((entry, index) => {
-    const formData = new FormData();
-    formData.append("entry.322627286", entry['کد اختصاصی']);
-    formData.append("entry.574184555", entry['بادکنک شماره']);
-    formData.append("entry.355035596", entry['ترکیده؟']);
-    formData.append("entry.1832686006", entry['تعداد پمپ']);
-    formData.append("entry.1266799925", entry['پول کسب شده']);
-    formData.append("entry.548817805", entry['کل زمان صرف شده (ثانیه)']);
-    formData.append("entry.1593547984", entry['میانگین زمان هر پمپ (ثانیه)']);
-    formData.append("entry.1669638583", entry['انحراف تعداد پمپ از 16']);
-    // اگر فیلد زمان هر پمپ را هم اضافه کردی، اینجا append کن.
+  document.getElementById('balloonImg').src = 'Balloon1.png';
+  updateBalloon();
+  document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
+  document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
+  document.getElementById('balloonScoreDisplay').innerText = ${toPersianDigits(0)} تومان;
+  document.getElementById('balloonScoreDisplay').style.color = '';
+  showMessage('');
+}
 
-    setTimeout(() => {
-      fetch(formUrl, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors"
-      }).then(() => {
-        console.log(`✅ ردیف ${index + 1} ارسال شد`);
-        if (index === data.length - 1) alert("✅ تمام داده‌ها به گوگل فرم ارسال شد!");
-      }).catch(err => {
-        console.error("❌ خطا در ارسال", err);
-      });
-    }, index * 500);
-  });
+function downloadExcel() {
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
 }
 </script>
 
