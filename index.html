@@ -300,6 +300,24 @@ function nextBalloon() {
 }
 
 function downloadExcel() {
+  // ارسال به Google Sheet
+  fetch("https://script.google.com/macros/s/AKfycbxVrXMveoiJc8cKJdREaVdam_oHtmhQv2sm7ltGsyCPZRnR3arzdK471dbQoPbFMR0zyQ/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log("✅ اطلاعات با موفقیت ارسال شد به Google Sheet");
+    } else {
+      console.error("❌ ارسال اطلاعات به مشکل خورد:", response.statusText);
+    }
+  })
+  .catch(error => console.error("❌ خطا:", error));
+
+  // دانلود فایل Excel
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
