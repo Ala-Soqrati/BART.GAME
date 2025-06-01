@@ -1,226 +1,30 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>بازی بادکنک</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background: #f0f0ff;
-      font-family: 'Vazirmatn', sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .header { font-size: 30px; margin: 20px; font-weight: bold; }
-    .buttons { margin: 20px; }
-    button {
-      padding: 15px 25px;
-      font-size: 20px;
-      margin: 10px;
-      font-family: 'Vazirmatn', sans-serif;
-    }
-    .current-score, .message, .info {
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    input[type="text"] {
-      padding: 10px;
-      font-size: 18px;
-      width: 250px;
-      margin-top: 10px;
-      text-align: center;
-    }
-  </style>
+  <title>تست ارسال به گوگل فرم</title>
 </head>
 <body>
+  <h2>تست ارسال به فرم Google</h2>
+  <button onclick="sendTestToForm()">ارسال تست</button>
 
-<div class="header">بازی بادکنک پولی</div>
+  <script>
+    function sendTestToForm() {
+      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
+      const formData = new FormData();
+      formData.append("entry.322627286", "تست_کاربر");
 
-<div id="introForm">
-  <p>کد کاربر را وارد کنید:</p>
-  <input type="text" id="userCodeInput" maxlength="10">
-  <br><br>
-  <button onclick="startGame()">شروع بازی</button>
-</div>
-
-<div class="buttons">
-  <button id="pumpBtn" disabled>باد کردن</button>
-  <button id="collectBtn" disabled>جمع کردن</button>
-</div>
-
-<div class="current-score" id="balloonScoreDisplay">۰ تومان</div>
-<div><img id="balloonImg" src="Balloon1.png" width="150" height="150"></div>
-<div class="message" id="message"></div>
-<div class="info">
-  <div>کل امتیاز: <span id="totalScore">۰</span></div>
-  <div>تعداد پمپ: <span id="inflateCount">۰</span></div>
-  <div>بادکنک <span id="balloonNumber">۱</span> از ۳۰</div>
-</div>
-
-<script>
-let totalScore = 0, inflateCount = 0, balloonNumber = 1;
-let balloonScore = 0, balloonSize = 150, balloonPopped = false;
-let isWaiting = false, pumpTimes = [], pumpStart = null;
-let data = [], userCode = "";
-const totalBalloons = 2;
-
-function toPersianDigits(n) {
-  return n.toLocaleString('fa-IR');
-}
-
-function startGame() {
-  const input = document.getElementById('userCodeInput').value.trim();
-  if (!input) return alert("کد کاربر را وارد کنید.");
-  userCode = input;
-  document.getElementById('introForm').style.display = 'none';
-  document.getElementById('pumpBtn').disabled = false;
-  document.getElementById('collectBtn').disabled = false;
-  showMessage("بازی شروع شد!");
-}
-
-document.getElementById('pumpBtn').onclick = pumpBalloon;
-document.getElementById('collectBtn').onclick = collectScore;
-
-document.addEventListener('keydown', function(e) {
-  if (isWaiting || document.getElementById('pumpBtn').disabled) return;
-  if (e.key === 'Enter') pumpBalloon();
-  if (e.code === 'Space') collectScore();
-});
-
-function pumpBalloon() {
-  if (balloonPopped || isWaiting) return;
-  if (!pumpStart) pumpStart = Date.now();
-  const now = Date.now();
-  pumpTimes.push((now - pumpStart) / 1000);
-  pumpStart = now;
-
-  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount);
-  if (Math.random() < popChance || inflateCount >= 32) {
-    popBalloon();
-  } else {
-    inflateCount++;
-    balloonScore += 5000;
-    balloonSize += 5;
-    updateBalloon();
-  }
-}
-
-function popBalloon() {
-  balloonPopped = true;
-  document.getElementById('balloonImg').src = 'pop.png';
-  saveData(0, 'ترکید');
-  startCountdown(true);
-}
-
-function collectScore() {
-  if (balloonPopped || isWaiting) return;
-  totalScore += balloonScore;
-  showMessage(`شما ${toPersianDigits(balloonScore)} تومان بردید`);
-  document.getElementById('balloonScoreDisplay').style.color = 'green';
-  saveData(balloonScore, 'نترکید');
-  startCountdown(false);
-}
-
-function updateBalloon() {
-  const img = document.getElementById('balloonImg');
-  img.width = img.height = balloonSize;
-  document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
-  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
-  document.getElementById('totalScore').innerText = toPersianDigits(totalScore);
-}
-
-function showMessage(msg) {
-  document.getElementById('message').innerText = msg;
-}
-
-function saveData(score, status) {
-  const totalTime = pumpTimes.reduce((a, b) => a + b, 0);
-  const meanTime = totalTime / (pumpTimes.length || 1);
-  data.push({
-    'کد کاربر': userCode,
-    'بادکنک': balloonNumber,
-    'تعداد پمپ': inflateCount,
-    'پول': score,
-    'وضعیت': status,
-    'زمان کل': totalTime.toFixed(2),
-    'میانگین': meanTime.toFixed(2),
-    'انحراف از 16': inflateCount - 16,
-    'زمان‌ها': pumpTimes.map(t => t.toFixed(2)).join(', ')
-  });
-}
-
-function startCountdown(popped) {
-  isWaiting = true;
-  let counter = 3;
-  const interval = setInterval(() => {
-    showMessage(popped ? `ترکید! شروع در ${counter}` : `شروع در ${counter}`);
-    counter--;
-    if (counter < 0) {
-      clearInterval(interval);
-      nextBalloon();
+      fetch(formUrl, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors"
+      }).then(() => {
+        alert("✅ داده تستی ارسال شد!");
+      }).catch((err) => {
+        alert("❌ خطا در ارسال");
+        console.error(err);
+      });
     }
-  }, 1000);
-}
-
-function nextBalloon() {
-  if (balloonNumber >= totalBalloons) {
-    sendDataToGoogleForm();
-    return;
-  }
-  balloonNumber++;
-  inflateCount = 0;
-  balloonScore = 0;
-  balloonSize = 150;
-  balloonPopped = false;
-  isWaiting = false;
-  pumpTimes = [];
-  pumpStart = null;
-  document.getElementById('balloonImg').src = 'Balloon1.png';
-  updateBalloon();
-  document.getElementById('inflateCount').innerText = toPersianDigits(0);
-  document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
-  document.getElementById('balloonScoreDisplay').style.color = '';
-  showMessage('');
-}
-
-// ✅ ارسال نتایج به فرم Google
-function sendDataToGoogleForm() {
-  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
-
-  const header = Object.keys(data[0]).join('\t');
-  const rows = data.map(row => Object.values(row).join('\t'));
-  const fullText = [header, ...rows].join('\n');
-
-  const totalPumps = data.reduce((sum, r) => sum + r['تعداد پمپ'], 0);
-  const totalTime = data.reduce((sum, r) => sum + parseFloat(r['زمان کل']), 0);
-  const meanTime = totalTime / data.length;
-  const meanDiff = data.reduce((sum, r) => sum + r['انحراف از 16'], 0) / data.length;
-
-  const formData = new FormData();
-  formData.append("entry.322627286", userCode); // کد کاربر
-  formData.append("entry.574184555", data.length); // تعداد بادکنک
-  formData.append("entry.355035596", "نهایی"); // وضعیت کلی
-  formData.append("entry.1832686006", totalTime.toFixed(2)); // کل زمان
-  formData.append("entry.1266799925", meanTime.toFixed(2)); // میانگین زمان
-  formData.append("entry.548817805", meanDiff.toFixed(2)); // انحراف از 16
-  formData.append("entry.1593547984", totalPumps); // مجموع پمپ‌ها
-  formData.append("entry.1669638583", fullText); // جدول کامل
-
-  fetch(formUrl, {
-    method: "POST",
-    body: formData,
-    mode: "no-cors"
-  }).then(() => {
-    alert("✅ نتایج با موفقیت ارسال شد!");
-    showMessage("✅ نتایج به Google Sheets ارسال شد.");
-  }).catch((err) => {
-    alert("❌ خطا در ارسال!");
-    console.error(err);
-  });
-}
-</script>
-
+  </script>
 </body>
 </html>
