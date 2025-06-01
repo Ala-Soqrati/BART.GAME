@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>بازی بادکنک</title>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     body {
       background: url('background7.png') no-repeat center center fixed;
@@ -89,7 +87,6 @@
       background: rgba(0, 0, 0, 0.6);
       z-index: 5;
     }
-
     @media (max-width: 768px) {
       body {
         font-size: 1em;
@@ -278,7 +275,7 @@ function startCountdown(isPopped) {
 
 function nextBalloon() {
   if (balloonNumber >= totalBalloons) {
-    downloadExcel();
+    sendDataToGoogleForm(); // ✅ ارسال داده‌ها به فرم Google
     return;
   }
   balloonNumber++;
@@ -299,12 +296,29 @@ function nextBalloon() {
   showMessage('');
 }
 
-function downloadExcel() {
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
+// ✅ تابع جدید: ارسال نتایج نهایی به Google Form
+function sendDataToGoogleForm() {
+  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc4F0SNY7s1ZyoU4A_fPENZlXP60dB3WLiGkmCNHBaSFVFacw/formResponse";
+
+  const header = Object.keys(data[0]).join('\t');
+  const rows = data.map(row => Object.values(row).join('\t'));
+  const fullText = [header, ...rows].join('\n');
+
+  const formData = new FormData();
+  formData.append("entry.1004841166", userCode); // کد کاربر
+  formData.append("entry.197524038", fullText);  // جدول داده‌ها در فیلد زمان هر پمپ
+
+  fetch(formUrl, {
+    method: "POST",
+    body: formData,
+    mode: "no-cors"
+  }).then(() => {
+    alert("✅ نتایج با موفقیت به فرم Google ارسال شد.");
+    showMessage("✅ نتایج ارسال شد. بازی به پایان رسید.");
+  }).catch((err) => {
+    alert("❌ ارسال به فرم انجام نشد. لطفاً اتصال اینترنت را بررسی کنید.");
+    console.error(err);
+  });
 }
 </script>
 
