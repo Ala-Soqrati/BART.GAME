@@ -290,6 +290,14 @@ function nextBalloon() {
   showMessage('');
 }
 
+function collectScore() {
+  if (balloonPopped || isWaiting) return;
+  totalScore += balloonScore;
+  saveData(balloonScore, 'جمع کرده');
+  showMessage(`🎉 شما ${toPersianDigits(balloonScore)} تومان بردید!`);
+  startCountdown(false);
+}
+
 function downloadExcel() {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
