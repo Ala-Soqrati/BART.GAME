@@ -228,19 +228,34 @@ function sendDataToGoogleForm() {
   const rows = data.map(row => Object.values(row).join('\t'));
   const fullText = [header, ...rows].join('\n');
 
+  const totalBalloonsPlayed = data.length;
+  const totalPumps = data.reduce((sum, row) => sum + row['تعداد پمپ'], 0);
+  const totalScore = data.reduce((sum, row) => sum + row['پول کسب شده'], 0);
+  const totalTime = data.reduce((sum, row) => sum + parseFloat(row['کل زمان صرف شده (ثانیه)']), 0);
+  const meanTime = totalTime / totalBalloonsPlayed;
+  const meanPump = totalPumps / totalBalloonsPlayed;
+  const meanDiffFrom16 = data.reduce((sum, row) => sum + (row['انحراف تعداد پمپ از 16']), 0) / totalBalloonsPlayed;
+
   const formData = new FormData();
-  formData.append("entry.1004841166", userCode); // کد کاربر
-  formData.append("entry.197524038", fullText);  // تمام داده‌ها
+  formData.append("entry.1004841166", userCode);                // کد اختصاصی
+  formData.append("entry.1364215517", totalBalloonsPlayed);     // شماره بادکنک ← به جای "تعداد بازی شده"
+  formData.append("entry.1477489144", totalPumps);              // تعداد پمپ
+  formData.append("entry.1241739633", totalScore);              // پول کسب شده
+  formData.append("entry.1764631706", "نترکیده");              // وضعیت کلی (نمادین)
+  formData.append("entry.1429971893", totalTime.toFixed(2));    // کل زمان
+  formData.append("entry.1349933636", meanTime.toFixed(2));     // میانگین زمان پمپ
+  formData.append("entry.1466503295", meanDiffFrom16.toFixed(2)); // انحراف از ۱۶ پمپ
+  formData.append("entry.197524038", fullText);                 // کل جدول داده‌ها
 
   fetch(formUrl, {
     method: "POST",
     body: formData,
     mode: "no-cors"
   }).then(() => {
-    alert("✅ نتایج با موفقیت به فرم Google ارسال شد.");
+    alert("✅ نتایج با موفقیت ارسال شد.");
     showMessage("✅ نتایج ارسال شد. بازی به پایان رسید.");
   }).catch((err) => {
-    alert("❌ ارسال به فرم انجام نشد.");
+    alert("❌ خطا در ارسال داده‌ها.");
     console.error(err);
   });
 }
