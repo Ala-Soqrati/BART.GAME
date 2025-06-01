@@ -189,6 +189,7 @@ function startGame() {
 document.getElementById('pumpBtn').onclick = pumpBalloon;
 document.getElementById('collectBtn').onclick = collectScore;
 
+// ✅ فعال‌سازی باد کردن با Enter و جمع کردن با Space
 document.addEventListener('keydown', function(e) {
   if (isWaiting || document.getElementById('pumpBtn').disabled) return;
   if (e.key === 'Enter') pumpBalloon();
@@ -290,6 +291,14 @@ function nextBalloon() {
   showMessage('');
 }
 
+function collectScore() {
+  if (balloonPopped || isWaiting) return;
+  totalScore += balloonScore;
+  saveData(balloonScore, 'جمع کرده');
+  showMessage(`🎉 شما ${toPersianDigits(balloonScore)} تومان بردید!`);
+  startCountdown(false);
+}
+
 function downloadExcel() {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
@@ -298,7 +307,7 @@ function downloadExcel() {
   saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
 }
 
-// ⛔ جلوگیری از double-tap zoom در آیفون
+// ✅ جلوگیری از double-tap zoom در آیفون
 let lastTouchTime = 0;
 document.addEventListener('touchend', function (e) {
   const now = Date.now();
