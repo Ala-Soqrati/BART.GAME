@@ -13,116 +13,40 @@
       text-align: center;
       padding: 20px;
     }
-    .header {
-      margin-bottom: 20px;
-      font-size: 32px;
-      font-weight: bold;
-    }
+    .header { margin-bottom: 20px; font-size: 32px; font-weight: bold; }
     .info {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      text-align: right;
-      font-size: 18px;
-      font-weight: bold;
+      position: absolute; top: 10px; right: 20px;
+      text-align: right; font-size: 18px; font-weight: bold;
     }
-    .info span {
-      font-weight: normal;
-    }
-    .buttons {
-      margin: 20px;
-    }
+    .info span { font-weight: normal; }
+    .buttons { margin: 20px; }
     button {
-      padding: 15px 30px;
-      margin: 0 10px;
-      font-size: 27px;
-      cursor: pointer;
-      font-weight: bold;
-      font-family: 'Vazirmatn', sans-serif;
+      padding: 15px 30px; margin: 0 10px; font-size: 27px;
+      cursor: pointer; font-weight: bold; font-family: 'Vazirmatn', sans-serif;
     }
-    .balloon {
-      position: relative;
-      margin-top: 30px;
-    }
-    .balloon img {
-      transition: width 0.3s, height 0.3s;
-    }
-    .current-score {
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .message {
-      margin-top: 20px;
-      font-size: 22px;
-      font-weight: bold;
-      height: 50px;
-    }
+    .balloon { position: relative; margin-top: 30px; }
+    .balloon img { transition: width 0.3s, height 0.3s; }
+    .current-score { margin-top: 10px; font-size: 20px; font-weight: bold; }
+    .message { margin-top: 20px; font-size: 22px; font-weight: bold; height: 50px; }
     .intro-form {
-      position: relative;
-      z-index: 10;
-      margin-bottom: 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      display: inline-block;
+      position: relative; z-index: 10; margin-bottom: 30px;
+      background: white; padding: 20px; border-radius: 12px; display: inline-block;
     }
-    .intro-form p {
-      font-weight: bold;
-      font-size: 20px;
-    }
+    .intro-form p { font-weight: bold; font-size: 20px; }
     input[type="text"] {
-      font-size: 20px;
-      padding: 10px;
-      text-align: center;
-      width: 300px;
-      direction: ltr;
-      font-family: 'Vazirmatn', sans-serif;
+      font-size: 20px; padding: 10px; text-align: center;
+      width: 300px; direction: ltr; font-family: 'Vazirmatn', sans-serif;
     }
     .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 5;
-    }
-    @media (max-width: 768px) {
-      body {
-        font-size: 1em;
-        padding: 15px;
-      }
-      .header {
-        font-size: 24px;
-        margin-bottom: 30px;
-        text-align: left;
-      }
-      .buttons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      button {
-        padding: 12px 20px;
-        font-size: 20px;
-      }
-      .current-score {
-        font-size: 18px;
-      }
-      .message {
-        font-size: 20px;
-      }
-      .info {
-        font-size: 16px;
-      }
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6); z-index: 5;
     }
   </style>
 </head>
 <body>
 
 <div class="overlay" id="overlay"></div>
-
 <div class="header">بادکنک پولی</div>
 
 <div class="intro-form" id="introForm">
@@ -260,7 +184,7 @@ function saveData(score, status) {
 
 function startCountdown(isPopped) {
   isWaiting = true;
-  let counter = 0;
+  let counter = 4;
   showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
   const interval = setInterval(() => {
     counter--;
@@ -275,7 +199,7 @@ function startCountdown(isPopped) {
 
 function nextBalloon() {
   if (balloonNumber >= totalBalloons) {
-    sendDataToGoogleForm(); // ✅ ارسال داده‌ها به فرم Google
+    sendDataToGoogleForm(); // ارسال داده در انتهای بازی
     return;
   }
   balloonNumber++;
@@ -296,7 +220,7 @@ function nextBalloon() {
   showMessage('');
 }
 
-// ✅ تابع جدید: ارسال نتایج نهایی به Google Form
+// ✅ ارسال نتایج نهایی به Google Form
 function sendDataToGoogleForm() {
   const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc4F0SNY7s1ZyoU4A_fPENZlXP60dB3WLiGkmCNHBaSFVFacw/formResponse";
 
@@ -306,7 +230,7 @@ function sendDataToGoogleForm() {
 
   const formData = new FormData();
   formData.append("entry.1004841166", userCode); // کد کاربر
-  formData.append("entry.197524038", fullText);  // جدول داده‌ها در فیلد زمان هر پمپ
+  formData.append("entry.197524038", fullText);  // تمام داده‌ها
 
   fetch(formUrl, {
     method: "POST",
@@ -316,7 +240,7 @@ function sendDataToGoogleForm() {
     alert("✅ نتایج با موفقیت به فرم Google ارسال شد.");
     showMessage("✅ نتایج ارسال شد. بازی به پایان رسید.");
   }).catch((err) => {
-    alert("❌ ارسال به فرم انجام نشد. لطفاً اتصال اینترنت را بررسی کنید.");
+    alert("❌ ارسال به فرم انجام نشد.");
     console.error(err);
   });
 }
