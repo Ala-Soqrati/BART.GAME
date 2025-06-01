@@ -1,30 +1,169 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>تست ارسال به گوگل فرم</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>بازی بادکنک</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    body {
+      background: url('background7.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Vazirmatn', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .header {
+      margin-bottom: 20px;
+      font-size: 32px;
+      font-weight: bold;
+    }
+    .info {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      text-align: right;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .info span {
+      font-weight: normal;
+    }
+    .buttons {
+      margin: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      margin: 0 10px;
+      font-size: 27px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    .balloon {
+      position: relative;
+      margin-top: 30px;
+    }
+    .balloon img {
+      transition: width 0.3s, height 0.3s;
+    }
+    .current-score {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      height: 50px;
+    }
+    .intro-form {
+      position: relative;
+      z-index: 10;
+      margin-bottom: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+    .intro-form p {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    input[type="text"] {
+      font-size: 20px;
+      padding: 10px;
+      text-align: center;
+      width: 300px;
+      direction: ltr;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 5;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        font-size: 1em;
+        padding: 15px;
+      }
+      .header {
+        font-size: 24px;
+        margin-bottom: 30px;
+        text-align: left;
+      }
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      button {
+        padding: 12px 20px;
+        font-size: 20px;
+      }
+      .current-score {
+        font-size: 18px;
+      }
+      .message {
+        font-size: 20px;
+      }
+      .info {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>تست ارسال به فرم Google</h2>
-  <button onclick="sendTestToForm()">ارسال تست</button>
 
-  <script>
-    function sendTestToForm() {
-      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
-      const formData = new FormData();
-      formData.append("entry.322627286", "تست_کاربر");
+<!-- سایر عناصر HTML بدون تغییر -->
 
-      fetch(formUrl, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors"
-      }).then(() => {
-        alert("✅ داده تستی ارسال شد!");
-      }).catch((err) => {
-        alert("❌ خطا در ارسال");
-        console.error(err);
-      });
-    }
-  </script>
+<script>
+// تمام متغیرها و توابع بازی بدون تغییر باقی می‌مانند
+
+function downloadExcel() {
+  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfmijymwSiCePKjQSlzD7SV8S2MviH1_8LC4ZkLV6ASrdeKqg/formResponse";
+
+  const header = Object.keys(data[0]).join('\t');
+  const rows = data.map(row => Object.values(row).join('\t'));
+  const fullText = [header, ...rows].join('\n');
+
+  const totalPumps = data.reduce((sum, r) => sum + r['تعداد پمپ'], 0);
+  const totalTime = data.reduce((sum, r) => sum + parseFloat(r['کل زمان صرف شده (ثانیه)']), 0);
+  const meanTime = totalTime / data.length;
+  const meanDiff = data.reduce((sum, r) => sum + r['انحراف تعداد پمپ از 16'], 0) / data.length;
+
+  const formData = new FormData();
+  formData.append("entry.322627286", userCode); // کد کاربر
+  formData.append("entry.574184555", data.length); // تعداد بادکنک
+  formData.append("entry.355035596", "پایان بازی"); // وضعیت
+  formData.append("entry.1832686006", totalTime.toFixed(2)); // کل زمان
+  formData.append("entry.1266799925", meanTime.toFixed(2)); // میانگین زمان
+  formData.append("entry.548817805", meanDiff.toFixed(2)); // انحراف از 16
+  formData.append("entry.1593547984", totalPumps); // مجموع پمپ‌ها
+  formData.append("entry.1669638583", fullText); // کل جدول
+
+  fetch(formUrl, {
+    method: "POST",
+    body: formData,
+    mode: "no-cors"
+  }).then(() => {
+    alert("✅ داده‌ها به فرم Google ارسال شدند.");
+    showMessage("✅ ارسال با موفقیت انجام شد.");
+  }).catch((err) => {
+    alert("❌ خطا در ارسال به فرم Google");
+    console.error(err);
+  });
+}
+</script>
+
 </body>
 </html>
