@@ -244,6 +244,7 @@
         ? 0
         : 1 / (MAX_PUMPS_BEFORE_POP - inflateCount);
       const rand = Math.random();
+    // کوچکترین عدد غیر صفر در این تابع تا 15 رقم اعشار دارد و بزرگترین آن نیز کمی از 1 کوچکتر است
 
       if (rand < popChance || inflateCount >= MAX_PUMPS_BEFORE_POP) {
         popBalloon();
