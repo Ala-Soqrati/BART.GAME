@@ -15,6 +15,41 @@
       text-align: center;
       padding: 20px;
     }
+
+    button {
+      padding: 15px 30px;
+      margin: 0 10px;
+      font-size: 27px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .full-screen-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 5;
+    }
+
+    #finalMessage {
+      display: none;
+      background: rgba(0,0,0,0.8);
+      z-index: 9999;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      flex-direction: column;
+    }
+
     .header {
       margin-bottom: 20px;
       font-size: 32px;
@@ -33,14 +68,6 @@
     }
     .buttons {
       margin: 20px;
-    }
-    button {
-      padding: 15px 30px;
-      margin: 0 10px;
-      font-size: 27px;
-      cursor: pointer;
-      font-weight: bold;
-      font-family: 'Vazirmatn', sans-serif;
     }
     .balloon {
       position: relative;
@@ -81,39 +108,6 @@
       direction: ltr;
       font-family: 'Vazirmatn', sans-serif;
     }
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 5;
-    }
-
-    #finalMessage {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      z-index: 9999;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      flex-direction: column;
-    }
-
-    #finalMessage a {
-      color: yellow;
-      text-decoration: underline;
-      font-size: 20px;
-      margin-top: 15px;
-    }
 
     @media (max-width: 768px) {
       body {
@@ -149,198 +143,234 @@
 </head>
 <body>
 
-<div class="overlay" id="overlay"></div>
+  <div class="full-screen-overlay overlay" id="overlay"></div>
 
-<div class="header">بادکنک اقتصادی</div>
+  <div class="header">بادکنک اقتصادی</div>
 
-<div class="intro-form" id="introForm">
-  <p>لطفاً نام و نام خانوادگی خود را وارد نمایید.</p>
-  <input type="text" id="userCodeInput" placeholder="" maxlength="20">
-  <br><br>
-  <button onclick="startGame()">شروع بازی</button>
-</div>
+  <div class="intro-form" id="introForm">
+    <p>لطفاً نام و نام خانوادگی خود را وارد نمایید.</p>
+    <input type="text" id="userCodeInput" placeholder="" maxlength="20">
+    <br><br>
+    <button id="startBtn">شروع بازی</button>
+  </div>
 
-<div class="buttons">
-  <button id="pumpBtn" disabled>باد کردن</button>
-  <button id="collectBtn" disabled>جمع کردن</button>
-</div>
+  <div class="buttons">
+    <button id="pumpBtn" disabled>باد کردن</button>
+    <button id="collectBtn" disabled>جمع کردن</button>
+  </div>
 
-<div class="current-score" id="balloonScoreDisplay">۰ تومان</div>
+  <div class="current-score" id="balloonScoreDisplay">۰ تومان</div>
 
-<div class="balloon">
-  <img id="balloonImg" src="Balloon1.png" width="150" height="150" alt="Balloon">
-</div>
+  <div class="balloon">
+    <img id="balloonImg" src="Balloon1.png" width="150" height="150" alt="Balloon">
+  </div>
 
-<div class="message" id="message"></div>
+  <div class="message" id="message"></div>
 
-<div class="info">
-  <div>حساب شما: <span id="totalScore">۰</span></div>
-  <div>شمارنده‌ : <span id="inflateCount">۰</span></div>
-  <div>بادکنک <span id="balloonNumber">۱</span> از ۳۰ بادکنک</div>
-</div>
+  <div class="info">
+    <div>حساب شما: <span id="totalScore">۰</span></div>
+    <div>شمارنده‌ : <span id="inflateCount">۰</span></div>
+    <div>بادکنک <span id="balloonNumber">۱</span> از ۳۰ بادکنک</div>
+  </div>
 
-<!-- ✅ پیام پایانی پس از دانلود اکسل -->
-<div id="finalMessage">
-  لطفاً فایل اکسل را دانلود کنید و از طریق لینک زیر به پرسشنامه برگردید.
-  <a href="https://survey.porsline.ir/s/nZZwtoT7" target="_blank">بازگشت به پرسشنامه</a>
-</div>
+  <div class="full-screen-overlay" id="finalMessage">
+    لطفاً فایل اکسل را دانلود کنید و از طریق لینک زیر به پرسشنامه برگردید.
+    <a href="https://survey.porsline.ir/s/nZZwtoT7" target="_blank">بازگشت به پرسشنامه</a>
+  </div>
 
-<script>
-let totalScore = 0;
-let inflateCount = 0;
-let balloonNumber = 1;
-let balloonScore = 0;
-let balloonSize = 150;
-let balloonPopped = false;
-let isWaiting = false;
-let pumpTimes = [];
-let pumpStart = null;
-let data = [];
-let userCode = "";
-const totalBalloons = 30;
+  <script>
+    // ثوابت
+    const INITIAL_BALLOON_SIZE    = 150;
+    const BALLOON_SIZE_INCREMENT  = 5;
+    const SCORE_PER_PUMP          = 5000;
+    const MAX_PUMPS_BEFORE_POP    = 32;
+    const COUNTDOWN_START         = 4;
+    const TOTAL_BALLOONS          = 30;
 
-function toPersianDigits(n) {
-  return n.toLocaleString('fa-IR');
-}
+    // حالت‌های بازی
+    let totalScore    = 0;
+    let inflateCount;
+    let balloonNumber = 1;
+    let balloonScore;
+    let balloonSize;
+    let balloonPopped;
+    let isWaiting; 
+    let pumpTimes;
+    let pumpStart;
+    let data          = [];
+    let userCode      = "";
 
-function startGame() {
-  const input = document.getElementById('userCodeInput').value.trim();
-  if (input === "") {
-    alert("لطفاً نام خود را وارد نمایید.");
-    return;
-  }
-  userCode = input;
-  document.getElementById('introForm').style.display = 'none';
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('pumpBtn').disabled = false;
-  document.getElementById('collectBtn').disabled = false;
-  showMessage("بازی شروع شد!");
-}
-
-document.getElementById('pumpBtn').onclick = pumpBalloon;
-document.getElementById('collectBtn').onclick = collectScore;
-
-document.addEventListener('keydown', function(e) {
-  if (isWaiting || document.getElementById('pumpBtn').disabled) return;
-  if (e.key === 'Enter') pumpBalloon();
-  if (e.code === 'Space') collectScore();
-});
-
-function pumpBalloon() {
-  if (balloonPopped || isWaiting) return;
-  if (!pumpStart) pumpStart = Date.now();
-
-  let now = Date.now();
-  pumpTimes.push((now - pumpStart) / 1000);
-  pumpStart = now;
-
-  const popChance = inflateCount === 0 ? 0 : 1 / (32 - inflateCount);
-  const rand = Math.random();
-
-  if (rand < popChance || inflateCount >= 32) {
-    popBalloon();
-  } else {
-    inflateCount++;
-    balloonScore += 5000;
-    balloonSize += 5;
-    updateBalloon();
-  }
-}
-
-function popBalloon() {
-  balloonPopped = true;
-  document.getElementById('balloonImg').src = 'pop.png';
-  saveData(0, 'ترکیده');
-  startCountdown(true);
-}
-
-function updateBalloon() {
-  const balloon = document.getElementById('balloonImg');
-  balloon.width = balloonSize;
-  balloon.height = balloonSize;
-  document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
-  document.getElementById('totalScore').innerText = toPersianDigits(totalScore);
-  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
-}
-
-function showMessage(msg) {
-  document.getElementById('message').innerText = msg;
-}
-
-function saveData(score, status) {
-  let meanPumpTime = pumpTimes.reduce((a, b) => a + b, 0) / (pumpTimes.length || 1);
-  let totalTime = pumpTimes.reduce((a, b) => a + b, 0);
-  data.push({
-    'نام': userCode,
-    'بادکنک شماره': balloonNumber,
-    'تعداد پمپ': inflateCount,
-    'پول کسب شده': score,
-    'ترکیده؟': status,
-    'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2),
-    'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2),
-    'انحراف تعداد پمپ از 16': inflateCount - 16,
-    'زمان هر پمپ (ثانیه)': pumpTimes.map(t => t.toFixed(2)).join(', ')
-  });
-}
-
-function collectScore() {
-  if (balloonPopped || isWaiting) return;
-  totalScore += balloonScore;
-  saveData(balloonScore, 'جمع شده');
-  startCountdown(false);
-}
-
-function startCountdown(isPopped) {
-  isWaiting = true;
-  let counter = 4;
-  showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
-  const interval = setInterval(() => {
-    counter--;
-    if (counter > 0) {
-      showMessage(isPopped ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}` : `شروع در: ${toPersianDigits(counter)}`);
-    } else {
-      clearInterval(interval);
-      nextBalloon();
+    // مقداردهی اولیه‌ی بادکنک
+    function resetBalloonState() {
+      inflateCount   = 0;
+      balloonScore   = 0;
+      balloonSize    = INITIAL_BALLOON_SIZE;
+      balloonPopped  = false;
+      isWaiting      = false;
+      pumpTimes      = [];
+      pumpStart      = null;
     }
-  }, 1000);
-}
 
-function nextBalloon() {
-  if (balloonNumber >= totalBalloons) {
-    downloadExcel();
-    return;
-  }
-  balloonNumber++;
-  inflateCount = 0;
-  balloonScore = 0;
-  balloonSize = 150;
-  balloonPopped = false;
-  isWaiting = false;
-  pumpTimes = [];
-  pumpStart = null;
+    // تبدیل اعداد به فارسی
+    function toPersianDigits(n) {
+      return n.toLocaleString('fa-IR');
+    }
 
-  document.getElementById('balloonImg').src = 'Balloon1.png';
-  updateBalloon();
-  document.getElementById('inflateCount').innerText = toPersianDigits(inflateCount);
-  document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
-  document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(0)} تومان`;
-  document.getElementById('balloonScoreDisplay').style.color = '';
-  showMessage('');
-}
+    // شروع بازی
+    function startGame() {
+      const input = document.getElementById('userCodeInput').value.trim();
+      if (input === "") {
+        alert("لطفاً نام خود را وارد نمایید.");
+        return;
+      }
+      userCode = input;
+      document.getElementById('introForm').style.display = 'none';
+      document.getElementById('overlay').style.display  = 'none';
+      document.getElementById('pumpBtn').disabled = false;
+      document.getElementById('collectBtn').disabled = false;
+      showMessage("بازی شروع شد!");
+    }
 
-function downloadExcel() {
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'bart_data.xlsx');
+    // پمپ بادکنک
+    function pumpBalloon() {
+      if (balloonPopped || isWaiting) return;
+      if (!pumpStart) pumpStart = Date.now();
 
-  document.getElementById("finalMessage").style.display = "flex";
- document.getElementById("pumpBtn").style.pointerEvents = "none";
-document.getElementById("collectBtn").style.pointerEvents = "none";
+      const now = Date.now();
+      pumpTimes.push((now - pumpStart) / 1000);
+      pumpStart = now;
 
-}
-</script>
+      const popChance = inflateCount === 0
+        ? 0
+        : 1 / (MAX_PUMPS_BEFORE_POP - inflateCount);
+      const rand = Math.random();
 
+      if (rand < popChance || inflateCount >= MAX_PUMPS_BEFORE_POP) {
+        popBalloon();
+      } else {
+        inflateCount++;
+        balloonScore += SCORE_PER_PUMP;
+        balloonSize  += BALLOON_SIZE_INCREMENT;
+        updateBalloon();
+      }
+    }
+
+    // ترکیدن بادکنک
+    function popBalloon() {
+      balloonPopped = true;
+      document.getElementById('balloonImg').src = 'pop.png';
+      saveData(0, 'ترکیده');
+      startCountdown(true);
+    }
+
+    // به‌روزرسانی UI بادکنک
+    function updateBalloon() {
+      const balloon = document.getElementById('balloonImg');
+      balloon.width  = balloonSize;
+      balloon.height = balloonSize;
+      document.getElementById('inflateCount').innerText       = toPersianDigits(inflateCount);
+      document.getElementById('totalScore').innerText         = toPersianDigits(totalScore);
+      document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(balloonScore)} تومان`;
+    }
+
+    // نمایش پیام
+    function showMessage(msg) {
+      document.getElementById('message').innerText = msg;
+    }
+
+    // ذخیره داده‌ها
+    function saveData(score, status) {
+      const totalTime    = pumpTimes.reduce((a, b) => a + b, 0);
+      const meanPumpTime = totalTime / (pumpTimes.length || 1);
+      data.push({
+        'نام': userCode,
+        'بادکنک شماره': balloonNumber,
+        'تعداد پمپ': inflateCount,
+        'پول کسب شده': score,
+        'ترکیده؟': status,
+        'کل زمان صرف شده (ثانیه)': totalTime.toFixed(2),
+        'میانگین زمان هر پمپ (ثانیه)': meanPumpTime.toFixed(2),
+        'انحراف تعداد پمپ از 16': inflateCount - 16,
+        'زمان هر پمپ (ثانیه)': pumpTimes.map(t => t.toFixed(2)).join(', ')
+      });
+    }
+
+    // جمع کردن امتیاز
+    function collectScore() {
+      if (balloonPopped || isWaiting) return;
+      totalScore += balloonScore;
+      saveData(balloonScore, 'جمع شده');
+      startCountdown(false);
+    }
+
+    // شمارش معکوس بین بادکنک‌ها
+    function startCountdown(isPopped) {
+      isWaiting = true;
+      let counter = COUNTDOWN_START;
+      showMessage(isPopped
+        ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}`
+        : `شروع در: ${toPersianDigits(counter)}`);
+      const interval = setInterval(() => {
+        counter--;
+        if (counter > 0) {
+          showMessage(isPopped
+            ? `بادکنک شما ترکید\nشروع در: ${toPersianDigits(counter)}`
+            : `شروع در: ${toPersianDigits(counter)}`);
+        } else {
+          clearInterval(interval);
+          nextBalloon();
+        }
+      }, 1000);
+    }
+
+    // رفتن به بادکنک بعدی یا پایان
+    function nextBalloon() {
+      if (balloonNumber >= TOTAL_BALLOONS) {
+        downloadExcel();
+        return;
+      }
+      balloonNumber++;
+      resetBalloonState();
+      document.getElementById('balloonImg').src      = 'Balloon1.png';
+      updateBalloon();
+      document.getElementById('inflateCount').innerText  = toPersianDigits(inflateCount);
+      document.getElementById('balloonNumber').innerText = toPersianDigits(balloonNumber);
+      document.getElementById('balloonScoreDisplay').innerText = `${toPersianDigits(0)} تومان`;
+      document.getElementById('balloonScoreDisplay').style.color = '';
+      showMessage('');
+    }
+
+    // دانلود اکسل و نمایش پیام نهایی
+    function downloadExcel() {
+      const ws   = XLSX.utils.json_to_sheet(data);
+      const wb   = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'BART Data');
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'bart_data.xlsx');
+
+      document.getElementById("finalMessage").style.display = "flex";
+      document.getElementById("pumpBtn").style.pointerEvents = "none";
+      document.getElementById("collectBtn").style.pointerEvents = "none";
+    }
+
+    // متصل کردن رویدادها پس از بارگزاری صفحه
+    document.addEventListener('DOMContentLoaded', () => {
+      const startBtn   = document.getElementById('startBtn');
+      const pumpBtn    = document.getElementById('pumpBtn');
+      const collectBtn = document.getElementById('collectBtn');
+
+      startBtn.addEventListener('click', startGame);
+      pumpBtn.addEventListener('click', pumpBalloon);
+      collectBtn.addEventListener('click', collectScore);
+
+      document.addEventListener('keydown', function(e) {
+        if (isWaiting || pumpBtn.disabled) return;
+        if (e.key === 'Enter') pumpBalloon();
+        if (e.code === 'Space') collectScore();
+      });
+
+      resetBalloonState();
+    });
+  </script>
 </body>
 </html>
