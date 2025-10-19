@@ -3,6 +3,7 @@ The Balloon Analogue Risk Task (BART) is a widely recognized computerized behavi
 BART is extensively used in psychological research to study addiction, gambling, impulsivity, and cognitive learning; in clinical assessments for anxiety and decision-making disorders; and in organizational hiring for high-stakes roles like finance and trading. For Persians and Iranians, this validated tool now offers a localized opportunity through Persian-language interfaces that maximize comprehension and participation—eliminating language barriers for native samples. Iranian researchers can leverage this accessible, culturally adapted format to investigate context-specific factors like social anxiety and anticipated regret on risk-taking, generating reliable data for publications, theses, and international collaborations while advancing behavioral science within Persian-speaking communities.
 
 **BART VALIDATIONS**:
+
 Established Paradigm: BART as risk-taking measure - Gold Standard for lab risk assessment
 
 Controlled Pumps: 30 pumps max (vs original 64) - Prevents extreme scores; standard adaptation
