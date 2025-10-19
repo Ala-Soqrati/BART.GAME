@@ -4,13 +4,23 @@ BART is extensively used in psychological research to study addiction, gambling,
 
 **BART VALIDATIONS**:
 Established Paradigm: BART as risk-taking measure - Gold Standard for lab risk assessment
+
 Controlled Pumps: 30 pumps max (vs original 64) - Prevents extreme scores; standard adaptation
+
 Blocked Design: 3 blocks × 10 balloons - Measures learning over time 
+
 Reward System: 20,000 IRR per pump - Monetary incentive = real motivation
+
 Random Burst: Math.random() algorithm - True randomness; matches original
+
 Burst Formula: P_burst = 1/(32-n) - Exact original equation 
+
 Optimal Stop: 16 pumps benchmark - Mathematical optimum validated
+
 DV Measures: Avg pumps, deviation from 16, total earnings - Standard BART metrics 
+
 Auto-Logging: All data auto-recorded - Eliminates human error
+
 UI Localization: Persian interface - Max comprehension for Iranian sample
+
 Psych Effects: Regret + Social Anxiety - Novel interaction on validated task
