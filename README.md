@@ -25,3 +25,5 @@ Auto-Logging: All data auto-recorded - Eliminates human error
 UI Localization: Persian interface - Max comprehension for Iranian sample
 
 Psych Effects: Regret + Social Anxiety - Novel interaction on validated task
+
+<img width="1902" height="970" alt="Screenshot 2025-10-20 093959" src="https://github.com/user-attachments/assets/42be81ba-b1ab-4a47-9e6a-298898d904a9" />
